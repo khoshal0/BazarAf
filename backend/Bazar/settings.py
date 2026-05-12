@@ -49,7 +49,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'Bazar.cors_middleware.MediaCorsMiddleware',  # Add custom CORS for media files
-    whitenoise.middleware.WhiteNoiseMiddleware
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 # Allow frontend to make requests
 CORS_ALLOWED_ORIGINS = [
