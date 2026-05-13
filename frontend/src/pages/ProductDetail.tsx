@@ -311,7 +311,7 @@ const ProductDetail: React.FC = () => {
               <div className="mb-4">
                 <div className="bg-gray-100 rounded-lg overflow-hidden aspect-square relative">
                   <img
-                    src={mainImage?.image_url || '/placeholder.png'}
+                    src={getAbsoluteImageUrl(mainImage?.image_url || '/placeholder.png')}
                     alt={product.name}
                     className="w-full h-full object-contain"
                   />
@@ -352,7 +352,7 @@ const ProductDetail: React.FC = () => {
                     }`}
                   >
                     <img
-                      src={image.image_url}
+                      src={getAbsoluteImageUrl(image.image_url)}
                       alt={`${product.name} ${index + 1}`}
                       className="w-full h-full object-cover"
                     />

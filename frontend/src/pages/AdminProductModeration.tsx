@@ -38,6 +38,7 @@ import {
 import { Input } from '@/app/components/ui/input';
 import { Textarea } from '@/app/components/ui/textarea';
 import { AlertCircle, CheckCircle, Package } from 'lucide-react';
+import { getAbsoluteImageUrl } from '@/utils/imageUtils';
 import adminService from '@/services/adminService';
 import Layout from '@/app/components/layout/Layout';
 
@@ -239,7 +240,7 @@ export const AdminProductModeration: React.FC = () => {
       return null;
     }
     const first = product.images[0];
-    return first.image_url || first.image || null;
+    return getAbsoluteImageUrl(first.image_url || first.image || null);
   };
 
   if (loading) {

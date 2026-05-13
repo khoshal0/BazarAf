@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         {/* Main Image */}
         <img
-          src={product.primary_image || '/placeholder-product.png'}
+          src={getAbsoluteImageUrl(product.primary_image || '/placeholder-product.png')}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"

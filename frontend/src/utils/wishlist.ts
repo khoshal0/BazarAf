@@ -1,4 +1,5 @@
 import { Product } from '@/types/category';
+import { getAbsoluteImageUrl } from '@/utils/imageUtils';
 
 export interface WishlistStorageItem {
   id: string;
@@ -53,7 +54,7 @@ export const toggleWishlistProduct = (product: Product): { added: boolean; items
     id: product.id,
     name: product.name,
     slug: product.slug,
-    image: product.primary_image || '/placeholder-product.png',
+    image: getAbsoluteImageUrl(product.primary_image || '/placeholder-product.png'),
     price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
     original_price: product.original_price,
     rating: product.average_rating || 0,

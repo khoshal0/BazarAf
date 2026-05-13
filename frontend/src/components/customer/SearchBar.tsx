@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Search, X, Loader2 } from 'lucide-react';
 import { productAPI } from '@/services/categoryApi';
 import { Product, Category, SearchResult } from '@/types/category';
+import { getAbsoluteImageUrl } from '@/utils/imageUtils';
 
 interface SearchBarProps {
   onSearch?: (query: string) => void;
@@ -162,7 +163,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 >
                   {/* Product Image */}
                   <img
-                    src={product.primary_image || '/placeholder.png'}
+                    src={getAbsoluteImageUrl(product.primary_image || '/placeholder.png')}
                     alt={product.name}
                     className="w-12 h-12 object-cover rounded"
                   />

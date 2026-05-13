@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Eye,
 } from 'lucide-react';
+import { getAbsoluteImageUrl } from '@/utils/imageUtils';
 
 /**
  * ProductApproval Page (Admin)
@@ -162,7 +163,7 @@ const ProductApproval: React.FC = () => {
                     <div className="flex-shrink-0">
                       {product.primary_image ? (
                         <img
-                          src={product.primary_image}
+                          src={getAbsoluteImageUrl(product.primary_image)}
                           alt={product.name}
                           className="w-24 h-24 object-cover rounded-lg"
                         />

@@ -5,12 +5,8 @@ import Layout from '../app/components/layout/Layout';
 import ProductCard from '@/components/customer/ProductCard';
 import { productAPI, categoryAPI } from '@/services/categoryApi';
 import { Product, Category } from '@/types/category';
-import {
-  Filter,
-  X,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+import { getAbsoluteImageUrl } from '@/utils/imageUtils';
+import { Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * ProductListing Page
@@ -311,7 +307,7 @@ const ProductListing: React.FC = () => {
                           id: p.id,
                           name: p.name,
                           price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
-                          image: p.primary_image || '/placeholder.png',
+                          image: getAbsoluteImageUrl(p.primary_image || '/placeholder.png'),
                           quantity: 1,
                           slug: p.slug,
                           seller: {

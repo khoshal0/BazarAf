@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Shield, Users, ShoppingBag, Truck, DollarSign, CheckCircle, XCircle, Eye, Package, Edit } from 'lucide-react';
 import { Button } from '../../app/components/ui/button';
+import { getProductImageUrl } from '@/utils/imageUtils';
 import { Card } from '../../app/components/ui/card';
 import { Badge } from '../../app/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../app/components/ui/tabs';
@@ -1048,7 +1049,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
                             <div className="flex items-center gap-3">
                               {product.images?.[0] && (
                                 <img 
-                                  src={product.images[0]} 
+                                  src={getProductImageUrl(product.images[0])} 
                                   alt={product.name}
                                   className="w-12 h-12 rounded object-cover"
                                 />
