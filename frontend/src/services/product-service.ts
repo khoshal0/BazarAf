@@ -1,5 +1,5 @@
 // File: src/services/product-service.ts
-import { apiClient } from '../lib/api-client';
+import { api } from './api';
 import { Product, PaginatedResponse } from '../types/api';
 
 export const productService = {
@@ -20,9 +20,11 @@ export const productService = {
     if (params?.status) queryParams.status = params.status; // Using status field
     
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', queryParams);
-      console.log('✅ Products loaded:', response);
-      return response;
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: queryParams,
+      });
+      console.log('✅ Products loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load products:', error);
       throw error;
@@ -32,9 +34,9 @@ export const productService = {
   // ==================== GET SINGLE PRODUCT ====================
   async getProduct(productId: string): Promise<Product> {
     try {
-      const response = await apiClient.get<Product>(`/products/${productId}/`);
-      console.log('✅ Product loaded:', response);
-      return response;
+      const response = await api.get<Product>(`/products/${productId}/`);
+      console.log('✅ Product loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load product:', error);
       throw error;
@@ -44,7 +46,7 @@ export const productService = {
   // ==================== DELETE PRODUCT ====================
   async deleteProduct(productId: string): Promise<void> {
     try {
-      await apiClient.delete(`/products/${productId}/`);
+      await api.delete(`/products/${productId}/`);
       console.log('✅ Product deleted');
     } catch (error) {
       console.error('❌ Failed to delete product:', error);
@@ -58,13 +60,15 @@ export const productService = {
     category?: string; 
   }): Promise<Product[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', {
-        status: 'approved',
-        page_size: (params?.page_size || 100).toString(),
-        ...(params?.category && { category: params.category })
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: {
+          status: 'approved',
+          page_size: String(params?.page_size || 100),
+          ...(params?.category ? { category: params.category } : {}),
+        },
       });
-      console.log('✅ Approved products loaded:', response);
-      return response.results;
+      console.log('✅ Approved products loaded:', response.data);
+      return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load approved products:', error);
       throw error;
@@ -74,12 +78,11 @@ export const productService = {
   // ==================== GET PENDING PRODUCTS ====================
   async getPendingProducts(): Promise<Product[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', {
-        status: 'pending',
-        page_size: '100'
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: { status: 'pending', page_size: '100' },
       });
-      console.log('✅ Pending products loaded:', response);
-      return response.results;
+      console.log('✅ Pending products loaded:', response.data);
+      return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load pending products:', error);
       throw error;
@@ -89,12 +92,11 @@ export const productService = {
   // ==================== GET INACTIVE PRODUCTS ====================
   async getInactiveProducts(): Promise<Product[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', {
-        status: 'inactive',
-        page_size: '100'
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: { status: 'inactive', page_size: '100' },
       });
-      console.log('✅ Inactive products loaded:', response);
-      return response.results;
+      console.log('✅ Inactive products loaded:', response.data);
+      return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load inactive products:', error);
       throw error;
@@ -104,12 +106,11 @@ export const productService = {
   // ==================== GET REJECTED PRODUCTS ====================
   async getRejectedProducts(): Promise<Product[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', {
-        status: 'rejected',
-        page_size: '100'
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: { status: 'rejected', page_size: '100' },
       });
-      console.log('✅ Rejected products loaded:', response);
-      return response.results;
+      console.log('✅ Rejected products loaded:', response.data);
+      return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load rejected products:', error);
       throw error;
@@ -119,12 +120,11 @@ export const productService = {
   // ==================== GET VENDOR PRODUCTS ====================
   async getVendorProducts(vendorId: string): Promise<Product[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Product>>('/products/', {
-        vendor_id: vendorId,
-        page_size: '100'
+      const response = await api.get<PaginatedResponse<Product>>('/products/', {
+        params: { vendor_id: vendorId, page_size: '100' },
       });
-      console.log(`✅ Vendor ${vendorId} products loaded:`, response);
-      return response.results;
+      console.log(`✅ Vendor ${vendorId} products loaded:`, response.data);
+      return response.data.results;
     } catch (error) {
       console.error(`❌ Failed to load vendor ${vendorId} products:`, error);
       throw error;
@@ -134,9 +134,9 @@ export const productService = {
   // ==================== ADMIN APPROVAL FUNCTIONS ====================
   async approveProduct(productId: string): Promise<Product> {
     try {
-      const response = await apiClient.post<Product>(`/products/${productId}/approve/`, {});
-      console.log('✅ Product approved:', response);
-      return response;
+      const response = await api.post<Product>(`/products/${productId}/approve/`, {});
+      console.log('✅ Product approved:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to approve product:', error);
       throw error;
@@ -145,11 +145,11 @@ export const productService = {
 
   async rejectProduct(productId: string, reason?: string): Promise<Product> {
     try {
-      const response = await apiClient.post<Product>(`/products/${productId}/reject/`, { 
+      const response = await api.post<Product>(`/products/${productId}/reject/`, {
         reason: reason || 'Product does not meet our standards'
       });
-      console.log('✅ Product rejected:', response);
-      return response;
+      console.log('✅ Product rejected:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to reject product:', error);
       throw error;

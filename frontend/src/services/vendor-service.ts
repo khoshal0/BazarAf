@@ -1,4 +1,4 @@
-import { apiClient } from '../lib/api-client';
+import { api } from './api';
 import { Vendor, PaginatedResponse } from '../types/api';
 
 export const vendorService = {
@@ -15,26 +15,43 @@ export const vendorService = {
     if (params?.status) queryParams.status = params.status;
     if (params?.search) queryParams.search = params.search;
     
-    return apiClient.get('/vendors/', queryParams);
+    const response = await api.get<PaginatedResponse<Vendor>>('/vendors/', {
+      params: queryParams,
+    });
+    return response.data;
   },
 
   async getVendor(vendorId: string): Promise<Vendor> {
-    return apiClient.get(`/vendors/${vendorId}/`);
+    const response = await api.get<Vendor>(`/vendors/${vendorId}/`);
+    return response.data;
   },
 
   async approveVendor(vendorId: string): Promise<{ status: string; message: string }> {
-    return apiClient.post(`/vendors/${vendorId}/approve/`, {});
+    const response = await api.post<{ status: string; message: string }>(
+      `/vendors/${vendorId}/approve/`,
+      {}
+    );
+    return response.data;
   },
 
   async rejectVendor(vendorId: string, reason: string = ''): Promise<{ status: string; message: string }> {
-    return apiClient.post(`/vendors/${vendorId}/reject/`, { reason });
+    const response = await api.post<{ status: string; message: string }>(
+      `/vendors/${vendorId}/reject/`,
+      { reason }
+    );
+    return response.data;
   },
 
   async suspendVendor(vendorId: string): Promise<{ status: string; message: string }> {
-    return apiClient.post(`/vendors/${vendorId}/suspend/`, {});
+    const response = await api.post<{ status: string; message: string }>(
+      `/vendors/${vendorId}/suspend/`,
+      {}
+    );
+    return response.data;
   },
 
   async getVendorStats(vendorId: string): Promise<any> {
-    return apiClient.get(`/vendors/${vendorId}/stats/`);
+    const response = await api.get(`/vendors/${vendorId}/stats/`);
+    return response.data;
   },
 };

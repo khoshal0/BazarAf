@@ -1,5 +1,5 @@
 // File: src/services/dashboard.ts
-import { apiClient } from '../lib/api-client';
+import { api } from './api';
 import { 
   DashboardResponse, 
   LogisticsStats, 
@@ -13,9 +13,9 @@ export const dashboardService = {
   // ==================== DASHBOARD STATS ====================
   async getStats(): Promise<DashboardResponse> {
     try {
-      const response = await apiClient.get<DashboardResponse>('/dashboard/');
-      console.log('✅ Dashboard stats loaded:', response);
-      return response;
+      const response = await api.get<DashboardResponse>('/dashboard/');
+      console.log('✅ Dashboard stats loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load dashboard stats:', error);
       throw error;
@@ -24,9 +24,9 @@ export const dashboardService = {
 
   async getLogisticsStats(): Promise<LogisticsStats> {
     try {
-      const response = await apiClient.get<LogisticsStats>('/logistics/stats/');
-      console.log('✅ Logistics stats loaded:', response);
-      return response;
+      const response = await api.get<LogisticsStats>('/logistics/stats/');
+      console.log('✅ Logistics stats loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load logistics stats:', error);
       throw error;
@@ -38,9 +38,9 @@ export const dashboardService = {
   // ==================== ORDER STATUS COUNTS ====================
   async getOrderStatusCounts(): Promise<OrderStatusCounts> {
     try {
-      const response = await apiClient.get<OrderStatusCounts>('/orders/status-counts/');
-      console.log('✅ Order status counts loaded:', response);
-      return response;
+      const response = await api.get<OrderStatusCounts>('/orders/status-counts/');
+      console.log('✅ Order status counts loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load order status counts:', error);
       throw error;
@@ -50,9 +50,9 @@ export const dashboardService = {
   // ==================== PAYOUT SUMMARY ====================
   async getPayoutSummary(): Promise<PayoutSummary> {
     try {
-      const response = await apiClient.get<PayoutSummary>('/payouts/summary/');
-      console.log('✅ Payout summary loaded:', response);
-      return response;
+      const response = await api.get<PayoutSummary>('/payouts/summary/');
+      console.log('✅ Payout summary loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load payout summary:', error);
       throw error;
@@ -62,12 +62,11 @@ export const dashboardService = {
   // ==================== RECENT ORDERS ====================
   async getRecentOrders(limit: number = 10): Promise<Order[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Order>>('/orders/', {
-        page_size: limit.toString(),
-        ordering: '-created_at'
+      const response = await api.get<PaginatedResponse<Order>>('/orders/', {
+        params: { page_size: limit.toString(), ordering: '-created_at' },
       });
-      console.log('✅ Recent orders loaded:', response);
-      return response.results;
+      console.log('✅ Recent orders loaded:', response.data);
+      return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load recent orders:', error);
       throw error;
@@ -80,13 +79,13 @@ export const dashboardService = {
   status: string
 ): Promise<{ success: boolean; status: string }> {
   try {
-    const response = await apiClient.patch<{ success: boolean; status: string }>(
+    const response = await api.patch<{ success: boolean; status: string }>(
       `/orders/${orderId}/update_status/`,
       { status }
     );
 
-    console.log('✅ Order status updated:', response.status);
-    return response;
+    console.log('✅ Order status updated:', response.data.status);
+    return response.data;
   } catch (error) {
     console.error('❌ Failed to update order status:', error);
     throw error;

@@ -3,7 +3,7 @@
  * Comprehensive API integration for BazaarAF e-commerce platform
  */
 
-import api from './api';
+import { api } from './api';
 import {
   Category,
   CategoryAttribute,

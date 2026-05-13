@@ -1,5 +1,5 @@
 // File: src/services/order-service.ts
-import { apiClient } from '../lib/api-client';
+import { api } from './api';
 import { Order, PaginatedResponse, OrderStatusCounts } from '../types/api';
 
 export const orderService = {
@@ -18,9 +18,11 @@ export const orderService = {
     if (params?.ordering) queryParams.ordering = params.ordering;
     
     try {
-      const response = await apiClient.get<PaginatedResponse<Order>>('/orders/', queryParams);
-      console.log('✅ Orders loaded:', response);
-      return response;
+      const response = await api.get<PaginatedResponse<Order>>('/orders/', {
+        params: queryParams,
+      });
+      console.log('✅ Orders loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load orders:', error);
       throw error;
@@ -30,9 +32,9 @@ export const orderService = {
   // ==================== GET SINGLE ORDER ====================
   async getOrder(orderId: string): Promise<Order> {
     try {
-      const response = await apiClient.get<Order>(`/orders/${orderId}/`);
-      console.log('✅ Order loaded:', response);
-      return response;
+      const response = await api.get<Order>(`/orders/${orderId}/`);
+      console.log('✅ Order loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load order:', error);
       throw error;
@@ -42,9 +44,9 @@ export const orderService = {
   // ==================== UPDATE ORDER STATUS ====================
   async updateOrderStatus(orderId: string, data: { status: string }): Promise<Order> {
     try {
-      const response = await apiClient.patch<Order>(`/orders/${orderId}/`, data);
-      console.log('✅ Order status updated:', response);
-      return response;
+      const response = await api.patch<Order>(`/orders/${orderId}/`, data);
+      console.log('✅ Order status updated:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to update order status:', error);
       throw error;
@@ -54,12 +56,12 @@ export const orderService = {
   // ==================== CONFIRM ORDER ====================
   async confirmOrder(orderId: string): Promise<{ status: string; message: string }> {
     try {
-      const response = await apiClient.post<{ status: string; message: string }>(
-        `/orders/${orderId}/confirm/`, 
+      const response = await api.post<{ status: string; message: string }>(
+        `/orders/${orderId}/confirm/`,
         {}
       );
-      console.log('✅ Order confirmed:', response);
-      return response;
+      console.log('✅ Order confirmed:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to confirm order:', error);
       throw error;
@@ -69,9 +71,9 @@ export const orderService = {
   // ==================== GET STATUS COUNTS ====================
   async getStatusCounts(): Promise<OrderStatusCounts> {
     try {
-      const response = await apiClient.get<OrderStatusCounts>('/orders/status-counts/');
-      console.log('✅ Order status counts loaded:', response);
-      return response;
+      const response = await api.get<OrderStatusCounts>('/orders/status-counts/');
+      console.log('✅ Order status counts loaded:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to load order status counts:', error);
       throw error;
@@ -81,12 +83,11 @@ export const orderService = {
   // ==================== GET ORDERS BY STATUS ====================
   async getOrdersByStatus(status: 'pending' | 'confirmed' | 'picked' | 'delivered' | 'cancelled'): Promise<Order[]> {
     try {
-      const response = await apiClient.get<PaginatedResponse<Order>>('/orders/', {
-        status: status,
-        page_size: '100'
+      const response = await api.get<PaginatedResponse<Order>>('/orders/', {
+        params: { status, page_size: '100' },
       });
-      console.log(`✅ ${status} orders loaded:`, response);
-      return response.results;
+      console.log(`✅ ${status} orders loaded:`, response.data);
+      return response.data.results;
     } catch (error) {
       console.error(`❌ Failed to load ${status} orders:`, error);
       throw error;
@@ -96,12 +97,12 @@ export const orderService = {
   // ==================== BULK UPDATE STATUS ====================
   async bulkUpdateStatus(orderIds: string[], status: string): Promise<{ success: boolean; updated: number }> {
     try {
-      const response = await apiClient.post<{ success: boolean; updated: number }>(
-        '/orders/bulk-update-status/', 
+      const response = await api.post<{ success: boolean; updated: number }>(
+        '/orders/bulk-update-status/',
         { order_ids: orderIds, status }
       );
-      console.log('✅ Bulk status update completed:', response);
-      return response;
+      console.log('✅ Bulk status update completed:', response.data);
+      return response.data;
     } catch (error) {
       console.error('❌ Failed to bulk update status:', error);
       throw error;
