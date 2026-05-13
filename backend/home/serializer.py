@@ -307,19 +307,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
         If request is available in context, use build_absolute_uri().
         Otherwise, return the image.url directly (relative path that frontned can handle).
         """
-        if not obj.image:
-            return None
-        
-        try:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-        except Exception:
-            pass
-        
-        # Fallback: return the relative URL path
-        # The frontend will handle prepending the API base URL
-        return obj.image.url
+        request = self.context.get('request')
+        return _file_url(obj.image, request)
 
 
 # ====================
@@ -641,7 +630,8 @@ class OrderItemSerializer(serializers.ModelSerializer):
         try:
             primary_image = obj.product.images.filter(is_primary=True).first()
             if primary_image and primary_image.image:
-                image_url = primary_image.image.url
+                request = self.context.get('request')
+                image_url = _file_url(primary_image.image, request)
         except Exception:
             image_url = None
 

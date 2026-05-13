@@ -40,6 +40,6 @@ urlpatterns = [
     prefix_default_language=False,  # Removes default language prefix (e.g., no /en/)
 )
 
-# Serve media files in development
-if settings.DEBUG:
+# Serve media files (required for product images)
+if settings.MEDIA_ROOT:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
