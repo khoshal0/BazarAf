@@ -7,9 +7,11 @@
  * Removes '/api' from the full API URL to get the backend base URL
  */
 const getApiBaseUrl = (): string => {
-  // Get the full API URL from environment
-  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-  
+  const defaultApiUrl = import.meta.env.PROD
+    ? 'https://bazaraf-production.up.railway.app/api'
+    : 'http://localhost:8000/api';
+  const apiUrl = import.meta.env.VITE_API_URL || defaultApiUrl;
+
   // Remove '/api' suffix to get backend base URL (for /media files)
   return apiUrl.replace(/\/api\/?$/, '');
 };

@@ -3,7 +3,10 @@
 import axios from 'axios';
 
 // Base URL for your Django backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const DEFAULT_API_BASE_URL = import.meta.env.PROD
+  ? 'https://bazaraf-production.up.railway.app/api'
+  : 'http://localhost:8000/api';
+const API_BASE_URL = (import.meta.env.VITE_API_URL || DEFAULT_API_BASE_URL).replace(/\/+$/, '');
 
 // Create axios instance
 export const api = axios.create({
