@@ -19,9 +19,7 @@ import {
 import { Button } from '../app/components/ui/button';
 import { Card } from '../app/components/ui/card';
 import { toast } from 'sonner';
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+import { api } from '../services/api';
 
 interface FormData {
   full_name: string;
@@ -166,7 +164,7 @@ const SellerRegistration: React.FC = () => {
       }
 
       const response = await axios.post(
-        `${API_BASE_URL}/seller-applications/`,
+        '/seller-applications/',
         formDataToSend,
         {
           headers: {

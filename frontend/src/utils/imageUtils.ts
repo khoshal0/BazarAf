@@ -3,25 +3,15 @@
  */
 
 /**
- * Get the API base URL dynamically
+ * Get the API base URL dynamically for media files
+ * Removes '/api' from the full API URL to get the backend base URL
  */
 const getApiBaseUrl = (): string => {
-  // Try to get from environment variable first
-  const envUrl = import.meta.env.VITE_API_URL;
-  if (envUrl) {
-    return envUrl.replace('/api', ''); // Remove /api suffix to get base URL
-  }
+  // Get the full API URL from environment
+  const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
   
-  // If running in development with Vite, use localhost
-  if (typeof window !== 'undefined') {
-    const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    if (isDevelopment) {
-      return 'http://localhost:8000';
-    }
-    // In production, use the current protocol and host
-    return window.location.origin.replace(/:\d+$/, ':8000');
-  }
-  return 'http://localhost:8000';
+  // Remove '/api' suffix to get backend base URL (for /media files)
+  return apiUrl.replace(/\/api\/?$/, '');
 };
 
 /**
