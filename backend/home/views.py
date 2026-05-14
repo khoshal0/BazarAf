@@ -12,7 +12,6 @@ from django.utils import timezone
 import logging
 import uuid
 import secrets
-import os
 
 from rest_framework import viewsets, status, permissions, filters
 from rest_framework.views import APIView
@@ -126,6 +125,36 @@ class IsVendorUser(permissions.BasePermission):
     """Permission for vendor role users"""
     def has_permission(self, request, view):
         return request.user.is_authenticated and request.user.role == 'vendor'
+
+
+class IsAdminOrSuperAdmin(permissions.BasePermission):
+    """Permission for admin-role or superadmin users"""
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_superuser or request.user.role == 'admin'
+        )
+
+
+class IsAdminOrSuperAdminOrVendor(permissions.BasePermission):
+    """Permission for admin-role, superadmin, or vendor users"""
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_superuser or request.user.role in ['admin', 'vendor']
+        )
+
+
+class IsOwnerAdminOrSuperAdmin(permissions.BasePermission):
+    """Permission for owners, admins, or superadmins on object actions"""
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser or request.user.role == 'admin':
+            return True
+        return IsOwnerOrAdmin().has_object_permission(request, view, obj)
 
 
 class IsRiderUser(permissions.BasePermission):
@@ -476,7 +505,7 @@ class RequestPasswordResetView(APIView):
             
             # Send email with reset link
             from .emails import send_password_reset_email
-            frontend_url = request.data.get('frontend_url', None) or os.getenv('FRONTEND_URL', 'https://bazaaraf.com')
+            frontend_url = request.data.get('frontend_url', 'https://bazaaraf.com')
             send_password_reset_email(user, reset_token, frontend_url)
             
             return Response({
@@ -757,15 +786,14 @@ class VendorViewSet(viewsets.ModelViewSet):
 class NotificationViewSet(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def get_queryset(self):
-        user = self.request.user
-        return Notification.objects.filter(user=user)
+        return Notification.objects.filter(user=self.request.user)
     
     @action(detail=False, methods=['get'])
     def unread_count(self, request):
         """Get count of unread notifications"""
-        count = self.get_queryset().filter(is_read=False).count()
+        count = Notification.objects.filter(user=request.user, is_read=False).count()
         return Response({'count': count})
     
     @action(detail=True, methods=['post'])
@@ -779,7 +807,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'])
     def mark_all_read(self, request):
         """Mark all notifications as read"""
-        self.get_queryset().filter(is_read=False).update(is_read=True)
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
         return Response({'status': 'success', 'message': 'All notifications marked as read'})
 # backend/home/views.py - ADD THIS
 
@@ -790,15 +818,13 @@ class SellerApplicationViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         if self.action == 'create':
-            permission_classes = [AllowAny]  # Anyone can submit application
+            return [AllowAny()]  # Anyone can submit application
         elif self.action in ['list', 'retrieve']:
-            permission_classes = [IsAdminUser | IsSuperAdmin | IsVendorUser]  # Admins and vendors can view
+            return [IsAdminOrSuperAdminOrVendor()]  # Admins and vendors can view
         elif self.action in ['approve', 'reject']:
-            permission_classes = [IsAdminUser | IsSuperAdmin]  # Only admins can approve/reject
+            return [IsAdminOrSuperAdmin()]  # Only admins can approve/reject
         else:
-            permission_classes = [IsAdminUser | IsSuperAdmin]
-
-        return [permission() for permission in permission_classes]
+            return [IsAdminOrSuperAdmin()]
     
     def get_queryset(self):
         user = self.request.user
@@ -1079,19 +1105,16 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'search', 'featured', 'reviews']:
-            permission_classes = [permissions.AllowAny]
+            return [permissions.AllowAny()]
         elif self.action == 'create':
-            permission_classes = [IsVendorUser]
+            return [IsVendorUser()]
         elif self.action in ['update', 'partial_update', 'destroy', 'upload_images']:
-            permission_classes = [IsOwnerOrAdmin | IsSuperAdmin]
+            return [IsOwnerAdminOrSuperAdmin()]
         elif self.action == 'toggle_active':
-            permission_classes = [IsOwnerOrAdmin | IsSuperAdmin]
+            return [IsOwnerAdminOrSuperAdmin()]
         elif self.action in ['approve', 'reject']:
-            permission_classes = [IsAdminUser | IsSuperAdmin]
-        else:
-            permission_classes = [permissions.IsAuthenticated]
-
-        return [permission() for permission in permission_classes]
+            return [IsAdminOrSuperAdmin()]
+        return [permissions.IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -1437,7 +1460,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'tree', 'main_categories', 'attributes']:
             return [permissions.AllowAny()]
-        return [(IsAdminUser | IsSuperAdmin)()]
+        return [IsAdminOrSuperAdmin()]
 
     def get_object(self):
         """Resolve categories by slug (default) and UUID for admin compatibility."""
@@ -1771,21 +1794,6 @@ class CheckoutOrderView(APIView):
                             f"Customer: {order.customer_name or order.customer_phone}."
                         ),
                         link=f'/vendor/orders/{order.id}',
-                    )
-
-                # Notify all admin users about the new order
-                admin_users = User.objects.filter(role='admin') | User.objects.filter(is_superuser=True)
-                for admin_user in admin_users:
-                    Notification.objects.create(
-                        user=admin_user,
-                        notification_type='order_placed',
-                        title='New Order Placed 🛒',
-                        message=(
-                            f"Order {order.order_id} placed. "
-                            f"Customer: {order.customer_name or order.customer_phone}. "
-                            f"Total: ₦{order.total_amount}"
-                        ),
-                        link=f'/admin/orders/{order.id}',
                     )
 
                 return Response({
@@ -2571,18 +2579,6 @@ class ReviewListView(generics.ListCreateAPIView):
                     f"{review.product.name}."
                 ),
                 link='/vendor/reviews',
-            )
-
-        admin_users = User.objects.filter(role='admin') | User.objects.filter(is_superuser=True)
-        for admin_user in admin_users:
-            Notification.objects.create(
-                user=admin_user,
-                notification_type='new_review',
-                title='New customer review submitted',
-                message=(
-                    f"{request.user.full_name} submitted a review for {review.product.name}."
-                ),
-                link='/admin/review-moderation',
             )
         
         response_serializer = ReviewSerializer(review, context={'request': request})

@@ -29,6 +29,9 @@ export function getAbsoluteImageUrl(url: string | null | undefined): string {
 
   // Already an absolute URL
   if (url.startsWith('http')) {
+    if (url.startsWith('http://') && url.includes('up.railway.app')) {
+      return url.replace('http://', 'https://');
+    }
     return url;
   }
 

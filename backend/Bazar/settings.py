@@ -18,6 +18,10 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here-chang
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# Trust proxy headers for correct scheme/host on Railway
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 ALLOWED_HOSTS = ['*']
 
 # Application definition
