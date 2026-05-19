@@ -369,7 +369,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
                 {selectedProduct.images.map((image, index) => (
                   <img 
                     key={index}
-                    src={image} 
+                    src={getProductImageUrl(image)} 
                     alt={`${selectedProduct.name} - ${index + 1}`}
                     className="w-full h-32 object-cover rounded-lg border"
                   />
@@ -389,7 +389,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
               </div>
               <div>
                 <label className="text-sm text-muted-foreground">Price</label>
-                <p className="font-medium mt-1">AFN {parseFloat(selectedProduct.price || 0).toLocaleString()}</p>
+                <p className="font-medium mt-1">AFN {parseFloat(String(selectedProduct.price || 0)).toLocaleString()}</p>
               </div>
               <div>
                 <label className="text-sm text-muted-foreground">Stock Quantity</label>
@@ -863,7 +863,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
                     </div>
                   </div>
                   <div className="text-2xl font-semibold mb-1">
-                    AFN {stats?.total_revenue.toLocaleString() || 0}
+                    AFN {stats?.total_revenue?.toLocaleString() || 0}
                   </div>
                   <div className="text-sm text-muted-foreground">Total Revenue</div>
                 </Card>
@@ -1072,7 +1072,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
                           </TableCell>
                           <TableCell>{product.category || 'Uncategorized'}</TableCell>
                           <TableCell className="font-semibold">
-                            AFN {parseFloat(product.price || 0).toLocaleString()}
+                            AFN {parseFloat(String(product.price || 0)).toLocaleString()}
                           </TableCell>
                           <TableCell>
                             <Badge 
@@ -1333,39 +1333,9 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
               </div>
 
               {!loading && payouts.length > 0 && (
-                <Card className="bg-white">
-                <h3 className="mb-3 font-semibold">Reconciliation Runs (Read Only)</h3>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Run</TableHead>
-                      <TableHead>Period</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Payouts</TableHead>
-                      <TableHead>Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {reconciliationRuns.map((run) => (
-                      <TableRow key={run.id}>
-                        <TableCell className="font-medium">{run.label}</TableCell>
-                        <TableCell>
-                          {new Date(run.periodStart).toLocaleDateString()} - {new Date(run.periodEnd).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={statusBadgeClass(run.status)}>{run.status}</Badge>
-                        </TableCell>
-                        <TableCell>{run.payoutCount}</TableCell>
-                        <TableCell>AFN {run.totalAmount.toLocaleString()}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {!reconciliationRuns.length && <div className="p-4 text-sm text-muted-foreground">No reconciliation runs available.</div>}
-                <p className="mt-2 text-xs text-muted-foreground">
-                  TODO(upgrade): add reconciliation run drill-down and export options.
-                </p>
-              </Card>
+                <Card className="bg-white p-4">
+                  <h3 className="mb-3 font-semibold">Pending Payouts</h3>
+                </Card>
               )}
 
               <Card className="p-4">

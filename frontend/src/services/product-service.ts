@@ -149,4 +149,14 @@ export const productService = {
   async rejectProductWithReason(productId: string, reason: string): Promise<Product> {
     return this.rejectProduct(productId, reason);
   },
+
+  async deactivateProduct(productId: string): Promise<Product> {
+    try {
+      const response = await api.post<Product>(`/products/${productId}/toggle_active/`, {});
+      return response.data;
+    } catch (error) {
+      console.error('❌ Failed to deactivate product:', error);
+      throw error;
+    }
+  },
 };
