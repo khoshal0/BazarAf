@@ -99,12 +99,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'Bazar.wsgi.application'
 
 # Database
-# Support PostgreSQL on Vercel via DATABASE_URL environment variable
-# Falls back to SQLite for local development
-if os.getenv('DATABASE_URL'):
+# Production: PostgreSQL via DATABASE_URL (Neon / Railway / etc.)
+# Local dev: Falls back to SQLite
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
     import dj_database_url
     DATABASES = {
-        'default': dj_database_url.config(default=os.getenv('DATABASE_URL'), conn_max_age=600)
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True,
+        )
     }
 else:
     DATABASES = {
@@ -140,7 +145,7 @@ LANGUAGES = [
 LOCALE_PATHS = [
     BASE_DIR / 'locale',  # Directory for translation files
 ]
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kabul'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True

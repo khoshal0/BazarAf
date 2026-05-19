@@ -1146,7 +1146,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         queryset = Product.objects.filter(status='approved', is_active=True)
         
         # Advanced filtering
-        self._apply_filters(queryset)
+        queryset = self._apply_filters(queryset)
         return queryset
 
     def get_object(self):
