@@ -83,7 +83,7 @@ const Wishlist: React.FC = () => {
           id: item.product_id,
           name: item.product_name,
           price: item.price,
-          image: item.product_image || '/placeholder-product.png',
+          image: item.product_image || '/placeholder.svg',
           quantity: 1,
           slug: item.slug,
           seller: {
@@ -141,7 +141,7 @@ const Wishlist: React.FC = () => {
                 {/* Product Image */}
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                   <img
-                    src={item.product_image || '/placeholder-product.png'}
+                    src={item.product_image || '/placeholder.svg'}
                     alt={item.product_name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />

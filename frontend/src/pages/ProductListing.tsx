@@ -307,7 +307,7 @@ const ProductListing: React.FC = () => {
                           id: p.id,
                           name: p.name,
                           price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
-                          image: getAbsoluteImageUrl(p.primary_image || '/placeholder.png'),
+                          image: getAbsoluteImageUrl(p.primary_image || '/placeholder.svg'),
                           quantity: 1,
                           slug: p.slug,
                           seller: {

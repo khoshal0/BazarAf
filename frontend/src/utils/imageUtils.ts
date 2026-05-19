@@ -24,7 +24,7 @@ const getApiBaseUrl = (): string => {
  */
 export function getAbsoluteImageUrl(url: string | null | undefined): string {
   if (!url) {
-    return '/placeholder.jpg';
+    return '/placeholder.svg';
   }
 
   // Already an absolute URL (includes R2 cloud storage URLs)
@@ -45,7 +45,7 @@ export function getAbsoluteImageUrl(url: string | null | undefined): string {
 export function getProductImageUrl(img: any): string {
   if (!img) {
     console.warn('⚠️ Image object is null/undefined');
-    return '/placeholder.jpg';
+    return '/placeholder.svg';
   }
   
   // Try image_url first (should be absolute from backend)
@@ -54,7 +54,7 @@ export function getProductImageUrl(img: any): string {
   
   if (!url) {
     console.warn('⚠️ Image URL not found in object:', img);
-    return '/placeholder.jpg';
+    return '/placeholder.svg';
   }
 
   return getAbsoluteImageUrl(url);
@@ -67,7 +67,7 @@ export function getProductImageUrl(img: any): string {
  */
 export function getProductImageUrls(images: any[]): string[] {
   if (!Array.isArray(images) || images.length === 0) {
-    return ['/placeholder.jpg'];
+    return ['/placeholder.svg'];
   }
 
   return images.map(getProductImageUrl);

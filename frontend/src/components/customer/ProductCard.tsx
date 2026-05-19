@@ -96,7 +96,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
           id: product.id,
           name: product.name,
           price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
-          image: getAbsoluteImageUrl(product.primary_image || '/placeholder-product.png'),
+          image: getAbsoluteImageUrl(product.primary_image || '/placeholder.svg'),
           quantity: 1,
           slug: product.slug,
           seller: {
@@ -128,7 +128,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         {/* Main Image */}
         <img
-          src={getAbsoluteImageUrl(product.primary_image || '/placeholder-product.png')}
+          src={getAbsoluteImageUrl(product.primary_image || '/placeholder.svg')}
           alt={product.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           loading="lazy"

@@ -715,7 +715,7 @@ const StoreFront: React.FC = () => {
                           <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
                             <div className="flex gap-4 p-5">
                               <img
-                                src={getAbsoluteImageUrl(product.primary_image || '/placeholder.png')}
+                                src={getAbsoluteImageUrl(product.primary_image || '/placeholder.svg')}
                                 alt={product.name}
                                 className="w-28 h-28 object-cover rounded-lg flex-shrink-0"
                               />

@@ -163,7 +163,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
                 >
                   {/* Product Image */}
                   <img
-                    src={getAbsoluteImageUrl(product.primary_image || '/placeholder.png')}
+                    src={getAbsoluteImageUrl(product.primary_image || '/placeholder.svg')}
                     alt={product.name}
                     className="w-12 h-12 object-cover rounded"
                   />

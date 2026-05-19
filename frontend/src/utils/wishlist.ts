@@ -54,7 +54,7 @@ export const toggleWishlistProduct = (product: Product): { added: boolean; items
     id: product.id,
     name: product.name,
     slug: product.slug,
-    image: getAbsoluteImageUrl(product.primary_image || '/placeholder-product.png'),
+    image: getAbsoluteImageUrl(product.primary_image || '/placeholder.svg'),
     price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
     original_price: product.original_price,
     rating: product.average_rating || 0,

@@ -130,7 +130,7 @@ const Cart: React.FC<CartProps> = ({ items, onUpdateQuantity, onRemoveItem }) =>
                               src={getAbsoluteImageUrl(item.image)}
                               alt={item.name}
                               onError={(e) => {
-                                e.currentTarget.src = '/placeholder-product.png';
+                                e.currentTarget.src = '/placeholder.svg';
                               }}
                               className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             />

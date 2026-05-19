@@ -173,7 +173,7 @@ const ProductDetail: React.FC = () => {
           name: product.name,
           price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
           image: getAbsoluteImageUrl(
-            product.images?.[0] ? getProductImageUrl(product.images[0]) : '/placeholder-product.png'
+            product.images?.[0] ? getProductImageUrl(product.images[0]) : '/placeholder.svg'
           ),
           quantity: quantity,
           slug: product.slug,
@@ -219,7 +219,7 @@ const ProductDetail: React.FC = () => {
         name: product.name,
         price: typeof product.price === 'string' ? parseFloat(product.price) : product.price,
         image: getAbsoluteImageUrl(
-          product.images?.[0] ? getProductImageUrl(product.images[0]) : '/placeholder-product.png'
+          product.images?.[0] ? getProductImageUrl(product.images[0]) : '/placeholder.svg'
         ),
         quantity: quantity,
         slug: product.slug,
@@ -311,7 +311,7 @@ const ProductDetail: React.FC = () => {
               <div className="mb-4">
                 <div className="bg-gray-100 rounded-lg overflow-hidden aspect-square relative">
                   <img
-                    src={getAbsoluteImageUrl(mainImage?.image_url || '/placeholder.png')}
+                    src={getAbsoluteImageUrl(mainImage?.image_url || '/placeholder.svg')}
                     alt={product.name}
                     className="w-full h-full object-contain"
                   />
