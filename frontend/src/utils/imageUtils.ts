@@ -27,12 +27,9 @@ export function getAbsoluteImageUrl(url: string | null | undefined): string {
     return '/placeholder.jpg';
   }
 
-  // Already an absolute URL
-  if (url.startsWith('http')) {
-    if (url.startsWith('http://') && url.includes('up.railway.app')) {
-      return url.replace('http://', 'https://');
-    }
-    return url;
+  // Already an absolute URL (includes R2 cloud storage URLs)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url.replace('http://', 'https://');
   }
 
   // Relative URL - prepend API base URL
@@ -60,9 +57,7 @@ export function getProductImageUrl(img: any): string {
     return '/placeholder.jpg';
   }
 
-  const result = getAbsoluteImageUrl(url);
-  console.log('✅ Image URL processed:', { input: url, output: result });
-  return result;
+  return getAbsoluteImageUrl(url);
 }
 
 /**
