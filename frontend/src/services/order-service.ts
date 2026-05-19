@@ -21,7 +21,7 @@ export const orderService = {
       const response = await api.get<PaginatedResponse<Order>>('/orders/', {
         params: queryParams,
       });
-      console.log('✅ Orders loaded:', response.data);
+      // console.log('✅ Orders loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load orders:', error);
@@ -33,7 +33,7 @@ export const orderService = {
   async getOrder(orderId: string): Promise<Order> {
     try {
       const response = await api.get<Order>(`/orders/${orderId}/`);
-      console.log('✅ Order loaded:', response.data);
+      // console.log('✅ Order loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load order:', error);
@@ -45,7 +45,7 @@ export const orderService = {
   async updateOrderStatus(orderId: string, data: { status: string }): Promise<Order> {
     try {
       const response = await api.patch<Order>(`/orders/${orderId}/`, data);
-      console.log('✅ Order status updated:', response.data);
+      // console.log('✅ Order status updated:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to update order status:', error);
@@ -60,7 +60,7 @@ export const orderService = {
         `/orders/${orderId}/confirm/`,
         {}
       );
-      console.log('✅ Order confirmed:', response.data);
+      // console.log('✅ Order confirmed:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to confirm order:', error);
@@ -72,7 +72,7 @@ export const orderService = {
   async getStatusCounts(): Promise<OrderStatusCounts> {
     try {
       const response = await api.get<OrderStatusCounts>('/orders/status-counts/');
-      console.log('✅ Order status counts loaded:', response.data);
+      // console.log('✅ Order status counts loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load order status counts:', error);
@@ -101,7 +101,7 @@ export const orderService = {
         '/orders/bulk-update-status/',
         { order_ids: orderIds, status }
       );
-      console.log('✅ Bulk status update completed:', response.data);
+      // console.log('✅ Bulk status update completed:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to bulk update status:', error);

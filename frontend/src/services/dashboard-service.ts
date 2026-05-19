@@ -14,7 +14,7 @@ export const dashboardService = {
   async getStats(): Promise<DashboardResponse> {
     try {
       const response = await api.get<DashboardResponse>('/dashboard/');
-      console.log('✅ Dashboard stats loaded:', response.data);
+      // console.log('✅ Dashboard stats loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load dashboard stats:', error);
@@ -25,7 +25,7 @@ export const dashboardService = {
   async getLogisticsStats(): Promise<LogisticsStats> {
     try {
       const response = await api.get<LogisticsStats>('/logistics/stats/');
-      console.log('✅ Logistics stats loaded:', response.data);
+      // console.log('✅ Logistics stats loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load logistics stats:', error);
@@ -39,7 +39,7 @@ export const dashboardService = {
   async getOrderStatusCounts(): Promise<OrderStatusCounts> {
     try {
       const response = await api.get<OrderStatusCounts>('/orders/status-counts/');
-      console.log('✅ Order status counts loaded:', response.data);
+      // console.log('✅ Order status counts loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load order status counts:', error);
@@ -51,7 +51,7 @@ export const dashboardService = {
   async getPayoutSummary(): Promise<PayoutSummary> {
     try {
       const response = await api.get<PayoutSummary>('/payouts/summary/');
-      console.log('✅ Payout summary loaded:', response.data);
+      // console.log('✅ Payout summary loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load payout summary:', error);
@@ -65,7 +65,7 @@ export const dashboardService = {
       const response = await api.get<PaginatedResponse<Order>>('/orders/', {
         params: { page_size: limit.toString(), ordering: '-created_at' },
       });
-      console.log('✅ Recent orders loaded:', response.data);
+      // console.log('✅ Recent orders loaded:', response.data);
       return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load recent orders:', error);
@@ -84,7 +84,7 @@ export const dashboardService = {
       { status }
     );
 
-    console.log('✅ Order status updated:', response.data.status);
+    // console.log('✅ Order status updated:', response.data.status);
     return response.data;
   } catch (error) {
     console.error('❌ Failed to update order status:', error);

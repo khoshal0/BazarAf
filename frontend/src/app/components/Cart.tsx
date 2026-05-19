@@ -31,9 +31,9 @@ const Cart: React.FC<CartProps> = ({ items, onUpdateQuantity, onRemoveItem }) =>
   const [promoCode, setPromoCode] = useState('');
   const [appliedPromo, setAppliedPromo] = useState<string | null>(null);
 
-  console.log('🛒 Cart component mounted/updated with items:', items);
-  console.log('   - Item count:', items.length);
-  console.log('   - Items details:', JSON.stringify(items, null, 2));
+  // console.log('🛒 Cart component mounted/updated with items:', items);
+  // console.log('   - Item count:', items.length);
+  // console.log('   - Items details:', JSON.stringify(items, null, 2));
 
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const deliveryFee = items.length > 0 ? 200 : 0;

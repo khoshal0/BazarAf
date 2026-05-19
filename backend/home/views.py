@@ -1139,7 +1139,7 @@ class ProductViewSet(viewsets.ModelViewSet):
             try:
                 vendor = user.vendor_profile
                 return Product.objects.filter(vendor=vendor).order_by('-created_at')
-            except:
+            except (Vendor.DoesNotExist, AttributeError):
                 pass
         
         # Customers and anonymous see only approved products
@@ -1201,7 +1201,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         """Create a new product"""
         try:
             vendor = request.user.vendor_profile
-        except:
+        except (Vendor.DoesNotExist, AttributeError):
             return Response(
                 {'error': 'Vendor profile not found'},
                 status=status.HTTP_403_FORBIDDEN

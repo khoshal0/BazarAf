@@ -109,7 +109,7 @@ const SignUp: React.FC = () => {
         frontend_url: window.location.origin, // Pass actual frontend URL (port 5174)
       });
 
-      console.log('Registration response:', response);
+
 
       // For e-commerce flow, both cases show success
       // (with or without email verification requirement)

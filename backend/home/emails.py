@@ -11,6 +11,7 @@ def send_vendor_approval_email(vendor):
     """
     Send email notification when vendor is approved
     """
+    frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
     subject = 'Congratulations! Your BazaarAF Seller Application is Approved ✅'
     
     message = f"""
@@ -30,15 +31,9 @@ You can now:
 ✓ Track your earnings
 
 Get Started:
-1. Log in at: https://bazaaraf.com/login
+1. Log in at: {frontend_url}/login
 2. Go to Vendor Dashboard
 3. Start adding your products
-
-Support:
-━━━━━━━━━━━━━━━━━━━━━━━━
-Email: seller-support@bazaaraf.com
-Phone: +93 700 123 456
-WhatsApp: +93 700 123 456
 
 We're excited to have you on board!
 

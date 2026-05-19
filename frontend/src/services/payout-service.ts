@@ -21,7 +21,7 @@ export const payoutService = {
       const response = await api.get<PaginatedResponse<Payout>>('/payouts/', {
         params: queryParams,
       });
-      console.log('✅ Payouts loaded:', response.data);
+      // console.log('✅ Payouts loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load payouts:', error);
@@ -36,7 +36,7 @@ export const payoutService = {
         `/payouts/${payoutId}/mark_paid/`,
         {}
       );
-      console.log('✅ Payout marked as paid:', response.data);
+      // console.log('✅ Payout marked as paid:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to mark payout as paid:', error);
@@ -48,7 +48,7 @@ export const payoutService = {
   async getSummary(): Promise<PayoutSummary> {
     try {
       const response = await api.get<PayoutSummary>('/payouts/summary/');
-      console.log('✅ Payout summary loaded:', response.data);
+      // console.log('✅ Payout summary loaded:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to load payout summary:', error);
@@ -62,7 +62,7 @@ export const payoutService = {
       const response = await api.get<PaginatedResponse<Payout>>('/payouts/', {
         params: { status: 'pending', page_size: '100' },
       });
-      console.log('✅ Pending payouts loaded:', response.data);
+      // console.log('✅ Pending payouts loaded:', response.data);
       return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load pending payouts:', error);
@@ -76,7 +76,7 @@ export const payoutService = {
       const response = await api.get<PaginatedResponse<Payout>>('/payouts/', {
         params: { status: 'paid', page_size: '100' },
       });
-      console.log('✅ Paid payouts loaded:', response.data);
+      // console.log('✅ Paid payouts loaded:', response.data);
       return response.data.results;
     } catch (error) {
       console.error('❌ Failed to load paid payouts:', error);
@@ -105,7 +105,7 @@ export const payoutService = {
         '/payouts/bulk-mark-paid/',
         { payout_ids: payoutIds }
       );
-      console.log('✅ Bulk mark paid completed:', response.data);
+      // console.log('✅ Bulk mark paid completed:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to bulk mark paid:', error);
@@ -120,7 +120,7 @@ export const payoutService = {
         '/payouts/generate/',
         {}
       );
-      console.log('✅ Payouts generated:', response.data);
+      // console.log('✅ Payouts generated:', response.data);
       return response.data;
     } catch (error) {
       console.error('❌ Failed to generate payouts:', error);

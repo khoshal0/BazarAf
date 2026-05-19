@@ -94,7 +94,7 @@ export default function App() {
         const savedCart = localStorage.getItem('cart');
         if (savedCart) {
           const parsed = JSON.parse(savedCart);
-          console.log('📦 Initialized cart from localStorage:', parsed);
+          // console.log('📦 Initialized cart from localStorage:', parsed);
           return parsed;
         }
       } catch (error) {
@@ -106,7 +106,7 @@ export default function App() {
 
   // Sync cart to localStorage whenever it changes
   useEffect(() => {
-    console.log('💾 Saving cart to localStorage:', cart);
+    // console.log('💾 Saving cart to localStorage:', cart);
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
@@ -114,16 +114,16 @@ export default function App() {
   useEffect(() => {
     // Handler for custom cartUpdated event from ProductDetail/ProductCard
     const handleCartUpdate = (e: any) => {
-      console.log('📡 Received cartUpdated event in App');
+      // console.log('📡 Received cartUpdated event in App');
       if (e.detail && Array.isArray(e.detail)) {
-        console.log('📦 Setting cart from event:', e.detail);
+        // console.log('📦 Setting cart from event:', e.detail);
         setCart(e.detail);
       }
     };
 
     // Add listener immediately
     window.addEventListener('cartUpdated', handleCartUpdate);
-    console.log('✅ Registered cartUpdated listener');
+    // console.log('✅ Registered cartUpdated listener');
 
     // Also set up polling every 500ms - more aggressive
     const pollInterval = setInterval(() => {
@@ -135,7 +135,7 @@ export default function App() {
             const prevStr = JSON.stringify(prev);
             const newStr = JSON.stringify(parsed);
             if (prevStr !== newStr) {
-              console.log('🔄 Cart updated from localStorage polling');
+              // console.log('🔄 Cart updated from localStorage polling');
               return parsed;
             }
             return prev;

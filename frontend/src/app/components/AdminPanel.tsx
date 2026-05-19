@@ -209,7 +209,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       setLoading(true);
       await vendorService.approveVendor(vendorId);
       await loadVendors();
-      console.log('Vendor approved successfully');
+      // console.log('Vendor approved successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to approve vendor');
       console.error('Approve error:', err);
@@ -223,7 +223,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       setLoading(true);
       await vendorService.suspendVendor(vendorId);
       await loadVendors();
-      console.log('Vendor rejected successfully');
+      // console.log('Vendor rejected successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to reject vendor');
       console.error('Reject error:', err);
@@ -238,7 +238,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       await payoutService.markPaid(payoutId);
       await loadPayouts();
       await loadPayoutSummary();
-      console.log('Payout processed successfully');
+      // console.log('Payout processed successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to process payout');
       console.error('Payout error:', err);
@@ -253,7 +253,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       setLoading(true);
       await productService.approveProduct(productId);
       await loadProducts();
-      console.log('Product approved successfully');
+      // console.log('Product approved successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to approve product');
       console.error('Product approve error:', err);
@@ -267,7 +267,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       setLoading(true);
       await productService.rejectProduct(productId);
       await loadProducts();
-      console.log('Product rejected successfully');
+      // console.log('Product rejected successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to reject product');
       console.error('Product reject error:', err);
@@ -281,7 +281,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       setLoading(true);
       await productService.deactivateProduct(productId);
       await loadProducts();
-      console.log('Product deactivated successfully');
+      // console.log('Product deactivated successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to deactivate product');
       console.error('Product deactivate error:', err);
@@ -298,7 +298,7 @@ export function AdminPanel({ onNavigate }: AdminPanelProps) {
       await loadOrderStatusCounts();
       setShowOrderStatusModal(false);
       setSelectedOrder(null);
-      console.log(`Order status updated to ${newStatus}`);
+      // console.log(`Order status updated to ${newStatus}`);
     } catch (err: any) {
       setError(err.message || 'Failed to update order status');
       console.error('Update order status error:', err);

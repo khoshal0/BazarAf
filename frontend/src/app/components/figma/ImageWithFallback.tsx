@@ -17,13 +17,13 @@ export function ImageWithFallback(props: React.ImgHTMLAttributes<HTMLImageElemen
   }
 
   const handleSuccess = () => {
-    console.log('✅ Image loaded successfully:', props.src);
+    // console.log('✅ Image loaded successfully:', props.src);
   }
 
   const { src, alt, style, className, ...rest } = props
   
   // Log on mount
-  console.log('🖼️ ImageWithFallback rendering:', { src, alt, className });
+  // console.log('🖼️ ImageWithFallback rendering:', { src, alt, className });
 
   return didError ? (
     <div

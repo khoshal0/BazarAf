@@ -44,11 +44,11 @@ export function ProductDetail({ product: initialProduct, onAddToCart, cartCount 
         try {
           setLoading(true);
           setError(null);
-          console.log('🔄 Fetching product with ID:', productId);
+          // console.log('🔄 Fetching product with ID:', productId);
           const data = await productsAPI.getProduct(productId);
-          console.log('✅ Product fetched successfully:', data);
-          console.log('  - Images in product:', data.images);
-          console.log('  - Images length:', data.images?.length);
+          // console.log('✅ Product fetched successfully:', data);
+          // console.log('  - Images in product:', data.images);
+          // console.log('  - Images length:', data.images?.length);
           setProduct(data);
           
           // Fetch reviews
@@ -71,7 +71,7 @@ export function ProductDetail({ product: initialProduct, onAddToCart, cartCount 
     try {
       setLoadingReviews(true);
       const reviewsData = await productsAPI.getProductReviews(id);
-      console.log('Fetched reviews:', reviewsData);
+      // console.log('Fetched reviews:', reviewsData);
       setReviews(Array.isArray(reviewsData) ? reviewsData : []);
     } catch (err) {
       console.error('Error fetching reviews:', err);
@@ -124,14 +124,14 @@ export function ProductDetail({ product: initialProduct, onAddToCart, cartCount 
   // Debug logging
   useEffect(() => {
     if (product.images && product.images.length > 0) {
-      console.log('🖼️ ProductDetail - Image Debug Info:');
-      console.log('  Raw images from API:', product.images);
+      // console.log('🖼️ ProductDetail - Image Debug Info:');
+      // console.log('  Raw images from API:', product.images);
       product.images.forEach((img: any, idx: number) => {
-        console.log(`  Image ${idx}:`, { image: img.image, image_url: img.image_url });
+        // console.log(`  Image ${idx}:`, { image: img.image, image_url: img.image_url });
       });
-      console.log('  Processed image URLs:', productImages);
-      console.log('  Selected image URL:', productImages[selectedImage]);
-      console.log('  Images count:', productImages.length);
+      // console.log('  Processed image URLs:', productImages);
+      // console.log('  Selected image URL:', productImages[selectedImage]);
+      // console.log('  Images count:', productImages.length);
     }
   }, [product.images, selectedImage, productImages]);
 
@@ -664,7 +664,7 @@ export function ProductDetail({ product: initialProduct, onAddToCart, cartCount 
                           if (productId) {
                             const updatedProduct = await productsAPI.getProduct(productId);
                             setProduct(updatedProduct);
-                            console.log('✅ Product data refreshed with new review stats');
+                            // console.log('✅ Product data refreshed with new review stats');
                           }
                         } catch (err) {
                           console.error('Error refreshing product data:', err);

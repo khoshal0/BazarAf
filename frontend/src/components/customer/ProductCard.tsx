@@ -42,7 +42,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
       console.warn('Product slug is missing, using fallback');
     }
     const navigateUrl = `/product/${product.slug || product.name.toLowerCase().replace(/\s+/g, '-')}`;
-    console.log('Navigating to:', navigateUrl, 'Slug:', product.slug);
     navigate(navigateUrl);
   };
 

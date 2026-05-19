@@ -58,7 +58,7 @@ const ProductDetail: React.FC = () => {
         try {
           const cart = JSON.parse(savedCart);
           const count = cart.reduce((sum: number, item: any) => sum + item.quantity, 0);
-          console.log('📊 Updated cart count:', count);
+          // cart count updated
           setCartItemCount(count);
         } catch (error) {
           console.error('❌ Error reading cart:', error);
@@ -73,7 +73,6 @@ const ProductDetail: React.FC = () => {
 
     // Listen for cart updates
     const handleCartUpdate = (e: any) => {
-      console.log('📡 Cart update event received in ProductDetail');
       updateCartCount();
     };
 
@@ -99,7 +98,6 @@ const ProductDetail: React.FC = () => {
       // Fetch product (includes view increment and refresh)
       const data = await productAPI.getProduct(productSlug);
       setProduct(data);
-      console.log('📊 Product loaded with updated stats - Views:', data?.views_count, 'Sales:', data?.sales_count);
       if (data?.id) {
         setWishlistActive(isInWishlist(data.id));
       }
@@ -152,20 +150,17 @@ const ProductDetail: React.FC = () => {
     }
     
     setIsAddingToCart(true);
-    console.log('🛒 Adding to cart:', product.name);
     
     try {
       // Get existing cart from localStorage
       const existingCartStr = localStorage.getItem('cart');
       const cart = existingCartStr ? JSON.parse(existingCartStr) : [];
-      console.log('📦 Current cart:', cart);
 
       // Check if product already in cart
       const existingItem = cart.find((item: any) => item.id === product.id);
 
       if (existingItem) {
         existingItem.quantity += quantity;
-        console.log('✏️ Updated quantity for:', product.name, 'New qty:', existingItem.quantity);
         toast.success(t('product_detail_updated_quantity_in_cart', { name: product.name }));
       } else {
         const cartItem = {
@@ -183,20 +178,15 @@ const ProductDetail: React.FC = () => {
           vendorId: product.vendor_id,
         };
         cart.push(cartItem);
-        console.log('✅ New item added:', cartItem);
         toast.success(t('product_detail_added_to_cart', { name: product.name }));
       }
 
       // Save to localStorage
       localStorage.setItem('cart', JSON.stringify(cart));
-      console.log('✅ Cart saved to localStorage');
-      console.log('   - Total items in cart:', cart.length);
-      console.log('   - Cart contents:', cart);
       
       // Dispatch custom event for App component
       const event = new CustomEvent('cartUpdated', { detail: cart });
       window.dispatchEvent(event);
-      console.log('📡 Dispatched cartUpdated event with data:', cart);
       
       // Reset quantity
       setQuantity(1);

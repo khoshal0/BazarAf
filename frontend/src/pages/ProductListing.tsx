@@ -323,7 +323,7 @@ const ProductListing: React.FC = () => {
                       const event = new CustomEvent('cartUpdated', { detail: cart });
                       window.dispatchEvent(event);
                       
-                      console.log('Product added to cart:', p.name);
+                      // product added to cart
                     } catch (error) {
                       console.error('Error adding to cart:', error);
                     }

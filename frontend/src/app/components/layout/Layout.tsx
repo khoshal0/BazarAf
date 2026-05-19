@@ -54,11 +54,11 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   const handleCartClick = () => {
-    console.log('🛒 Cart clicked');
+    // console.log('🛒 Cart clicked');
     if (onCartClick) {
       onCartClick();
     } else {
-      console.log('📍 Navigating to /cart');
+      // console.log('📍 Navigating to /cart');
       navigate('/cart');
     }
   };

@@ -166,7 +166,7 @@ export function CustomerHome({ onNavigate, cartCount }: CustomerHomeProps) {
   );
 
   useEffect(() => {
-    console.log('🎯 CustomerHome component mounted, fetching data...');
+    // console.log('🎯 CustomerHome component mounted, fetching data...');
     fetchData();
   }, []);
 
@@ -174,7 +174,7 @@ export function CustomerHome({ onNavigate, cartCount }: CustomerHomeProps) {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔄 Fetching categories and products...');
+      // console.log('🔄 Fetching categories and products...');
       
       // Fetch categories and products in parallel
       const [categoriesData, productsData] = await Promise.all([
@@ -185,8 +185,8 @@ export function CustomerHome({ onNavigate, cartCount }: CustomerHomeProps) {
         productsAPI.getFeaturedProducts()
       ]);
       
-      console.log('✅ Categories:', categoriesData);
-      console.log('✅ Products:', productsData);
+      // console.log('✅ Categories:', categoriesData);
+      // console.log('✅ Products:', productsData);
       
       // Handle both paginated and direct array responses
       const categoriesArray = Array.isArray(categoriesData) 
@@ -197,8 +197,8 @@ export function CustomerHome({ onNavigate, cartCount }: CustomerHomeProps) {
       
       setCategories(categoriesArray);
       setProducts(productsData.results.slice(0, 8));
-      console.log('✅ Set categories:', categoriesArray);
-      console.log('✅ Set products:', productsData.results.slice(0, 8));
+      // console.log('✅ Set categories:', categoriesArray);
+      // console.log('✅ Set products:', productsData.results.slice(0, 8));
     } catch (err: any) {
       console.error('❌ Error fetching data:', err);
       console.error('❌ Error details:', {
@@ -253,7 +253,7 @@ export function CustomerHome({ onNavigate, cartCount }: CustomerHomeProps) {
       onSearch={handleSearch}
       onCartClick={() => navigate('/cart')}
       onProfileClick={() => navigate('/profile')}
-      onLanguageChange={(lang) => console.log('Language:', lang)}
+      onLanguageChange={() => {}}
     >
       <div className="min-h-screen bg-white">
         {/* ============================================

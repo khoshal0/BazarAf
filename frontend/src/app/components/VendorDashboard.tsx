@@ -62,8 +62,8 @@ function clearCache(key?: string): void {
 // Debug mode: set to true for console logs during development
 const DEBUG_MODE = localStorage.getItem('DEBUG_DASHBOARD') === 'true';
 
-function debugLog(...args: any[]) {
-  if (DEBUG_MODE) console.log('[Dashboard]', ...args);
+function debugLog(..._args: any[]) {
+  // debug logging disabled in production
 }
 
 function debugError(...args: any[]) {
