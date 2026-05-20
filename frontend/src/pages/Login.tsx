@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Mail, Lock, Eye, EyeOff, Package, AlertCircle, Phone, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authAPI } from '../services/api';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 type LoginStep = 'credentials' | 'twofa';
 
@@ -127,15 +129,63 @@ const Login: React.FC = () => {
 
       setErrors((prev) => ({ ...prev, general: response.message || t('error_auth_failed') }));
     } catch (error: any) {
+      const data = error?.response?.data;
+      if (data?.requires_email_verification) {
+        navigate('/verify-email-pending', { state: { email: data.email } });
+        return;
+      }
       const message =
-        error?.response?.data?.message ||
-        error?.response?.data?.detail ||
+        data?.message ||
+        data?.detail ||
         t('error_invalid_email_phone');
       setErrors((prev) => ({ ...prev, general: message }));
     } finally {
       setLoading(false);
     }
   };
+
+  const handleGoogleResponse = useCallback(async (response: any) => {
+    setLoading(true);
+    setErrors({ identifier: '', password: '', twofa: '', general: '' });
+    try {
+      const result = await authAPI.googleAuth(response.credential);
+      if (result.status === 'success') {
+        finishAuth(result);
+      } else {
+        setErrors((prev) => ({ ...prev, general: result.message || 'Google sign-in failed' }));
+      }
+    } catch (error: any) {
+      setErrors((prev) => ({ ...prev, general: error?.response?.data?.message || 'Google sign-in failed' }));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      (window as any).google?.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+      });
+      const btnDiv = document.getElementById('google-signin-btn');
+      if (btnDiv) {
+        (window as any).google?.accounts.id.renderButton(btnDiv, {
+          theme: 'outline',
+          size: 'large',
+          width: '100%',
+          text: 'continue_with',
+        });
+      }
+    };
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, [handleGoogleResponse]);
 
   const handleTwoFactorSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -281,6 +331,20 @@ const Login: React.FC = () => {
               >
                 {loading ? t('login_logging_in') : t('login_button')}
               </button>
+
+              {GOOGLE_CLIENT_ID && (
+                <>
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                      <span className="px-4 bg-white text-gray-500">or</span>
+                    </div>
+                  </div>
+                  <div id="google-signin-btn" className="flex justify-center"></div>
+                </>
+              )}
             </form>
           ) : (
             <form onSubmit={handleTwoFactorSubmit} className="space-y-5">

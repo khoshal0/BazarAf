@@ -100,12 +100,15 @@ export const authAPI = {
     return response.data;
   },
   
-  // Get Vendor Statistaics
-  // Working...........
-  // getVendorStats: async () => {
-  // const response = await api.get('/vendors/stats/');
-  // return response.data;
-  // },
+  googleAuth: async (credential: string) => {
+    const response = await api.post('/auth/google/', { credential });
+    return response.data;
+  },
+
+  resendVerificationEmail: async (email: string) => {
+    const response = await api.post('/auth/resend-verification/', { email });
+    return response.data;
+  },
 };
 // frontend/src/services/api.ts
 export const createOrder = async (orderData: any) => {

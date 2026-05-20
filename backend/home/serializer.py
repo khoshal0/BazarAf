@@ -1074,16 +1074,11 @@ class RegisterSerializer(serializers.Serializer):
         user.set_password(password)
         user.save()
         
-        # Generate email verification token and send verification email
+        # Generate email verification token and send verification email (async - non-blocking)
         if user.email:
             verification_token = user.generate_email_verification_token()
-            
-            try:
-                from .emails import send_email_verification_email
-                send_email_verification_email(user, verification_token, frontend_url)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).warning(f"Failed to send verification email to {user.email}: {e}")
+            from .emails import send_email_verification_email
+            send_email_verification_email(user, verification_token, frontend_url)
         
         return user
 

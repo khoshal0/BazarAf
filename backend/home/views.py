@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.db.models import Q, Sum, Count, F
 from django.utils import timezone
 import logging
+import os
 import uuid
 import secrets
 
@@ -254,8 +255,14 @@ class LoginView(APIView):
                         'message': 'Account is inactive. Please contact support.'
                     }, status=status.HTTP_401_UNAUTHORIZED)
                 
-                # Note: Email verification is optional - don't block login for unverified emails
-                # Users register with phone (primary identifier) and email is secondary
+                # Check if email verification is required
+                if user.email and not user.email_verified:
+                    return Response({
+                        'status': 'error',
+                        'message': 'Please verify your email before logging in. Check your inbox for the verification link.',
+                        'requires_email_verification': True,
+                        'email': user.email
+                    }, status=status.HTTP_401_UNAUTHORIZED)
 
                 vendor = Vendor.objects.filter(user=user).first()
                 if vendor and vendor.two_factor_enabled and vendor.totp_secret:
@@ -427,6 +434,98 @@ class RegisterView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+class GoogleAuthView(APIView):
+    """
+    Handle Google OAuth sign-in. Accepts a Google ID token from the frontend,
+    verifies it, and creates/logs in the user.
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        from google.oauth2 import id_token
+        from google.auth.transport import requests as google_requests
+        
+        token = request.data.get('credential')
+        if not token:
+            return Response({
+                'status': 'error',
+                'message': 'Google credential is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            google_client_id = os.getenv('GOOGLE_CLIENT_ID', '')
+            if not google_client_id:
+                return Response({
+                    'status': 'error',
+                    'message': 'Google authentication is not configured'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Verify the Google ID token
+            idinfo = id_token.verify_oauth2_token(
+                token, google_requests.Request(), google_client_id
+            )
+            
+            email = idinfo.get('email')
+            full_name = idinfo.get('name', '')
+            
+            if not email:
+                return Response({
+                    'status': 'error',
+                    'message': 'Could not retrieve email from Google account'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if user exists
+            user = User.objects.filter(email__iexact=email).first()
+            
+            if user:
+                # Existing user - mark email as verified and log in
+                if not user.email_verified:
+                    user.email_verified = True
+                    user.save(update_fields=['email_verified'])
+            else:
+                # New user - create account
+                user = User(
+                    email=email,
+                    full_name=full_name,
+                    phone=f"+93{uuid.uuid4().hex[:9]}",  # Temp phone, user can update later
+                    email_verified=True,
+                    role='customer',
+                )
+                user.set_unusable_password()
+                user.save()
+            
+            if not user.is_active:
+                return Response({
+                    'status': 'error',
+                    'message': 'Account is inactive. Please contact support.'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            user_data = UserSerializer(user).data
+            
+            return Response({
+                'status': 'success',
+                'message': 'Login successful',
+                'user': user_data,
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }
+            })
+        except ValueError as e:
+            return Response({
+                'status': 'error',
+                'message': 'Invalid Google token'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            logger.error(f"Google auth error: {e}")
+            return Response({
+                'status': 'error',
+                'message': 'Authentication failed. Please try again.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
     
@@ -480,6 +579,45 @@ class VerifyEmailView(APIView):
                 'status': 'error',
                 'message': 'Invalid token'
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResendVerificationEmailView(APIView):
+    """
+    Resend email verification link
+    """
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({
+                'status': 'error',
+                'message': 'Email is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email__iexact=email)
+            if user.email_verified:
+                return Response({
+                    'status': 'success',
+                    'message': 'Email is already verified'
+                })
+            
+            verification_token = user.generate_email_verification_token()
+            frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+            from .emails import send_email_verification_email
+            send_email_verification_email(user, verification_token, frontend_url)
+            
+            return Response({
+                'status': 'success',
+                'message': 'Verification email sent. Please check your inbox.'
+            })
+        except User.DoesNotExist:
+            # Don't reveal if email exists
+            return Response({
+                'status': 'success',
+                'message': 'If this email is registered, a verification link has been sent.'
+            })
 
 
 class RequestPasswordResetView(APIView):

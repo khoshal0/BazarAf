@@ -27,6 +27,7 @@ import Login from '../pages/Login';
 import SignUp from '../pages/SignUp';
 import ForgotPassword from '../pages/ForgotPassword';
 import VerifyEmail from '../pages/VerifyEmail';
+import VerifyEmailPending from '../pages/VerifyEmailPending';
 import ResetPassword from '../pages/ResetPassword';
 import Landing from '../pages/Landing';
 import BecomeSeller from '../pages/BecomeSeller';
@@ -198,6 +199,7 @@ export default function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/verify-email-pending" element={<VerifyEmailPending />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/become-seller" element={<BecomeSeller />} />
           <Route path="/notifications" element={<Notifications />} />

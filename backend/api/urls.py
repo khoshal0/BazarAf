@@ -3,8 +3,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from home.views import (
-    LoginView, RegisterView, LogoutView, TwoFactorVerifyView,
-    VerifyEmailView, RequestPasswordResetView, ResetPasswordView,
+    LoginView, RegisterView, LogoutView, TwoFactorVerifyView, GoogleAuthView,
+    VerifyEmailView, ResendVerificationEmailView, RequestPasswordResetView, ResetPasswordView,
     UserViewSet, VendorViewSet, ProductViewSet, CategoryViewSet,
     OrderViewSet, DeliveryViewSet, PayoutViewSet,
     DashboardView, VendorDashboardView,
@@ -73,7 +73,9 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='login'),
     path('auth/2fa/verify/', TwoFactorVerifyView.as_view(), name='auth-2fa-verify'),
     path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/google/', GoogleAuthView.as_view(), name='google-auth'),
     path('auth/verify-email/', VerifyEmailView.as_view(), name='verify-email'),
+    path('auth/resend-verification/', ResendVerificationEmailView.as_view(), name='resend-verification'),
     path('auth/request-password-reset/', RequestPasswordResetView.as_view(), name='request-password-reset'),
     path('auth/reset-password/', ResetPasswordView.as_view(), name='reset-password'),
      # Checkout (NEW)

@@ -1,10 +1,12 @@
 // File 2: frontend/src/pages/SignUp.tsx
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { User, Phone, Mail, Lock, Eye, EyeOff, Package, AlertCircle, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authAPI } from '../services/api';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -28,6 +30,52 @@ const SignUp: React.FC = () => {
     confirmPassword: '',
     general: '',
   });
+
+  const handleGoogleResponse = useCallback(async (response: any) => {
+    setLoading(true);
+    setErrors({ full_name: '', phone: '', email: '', password: '', confirmPassword: '', general: '' });
+    try {
+      const result = await authAPI.googleAuth(response.credential);
+      if (result.status === 'success') {
+        localStorage.setItem('access_token', result.tokens.access);
+        localStorage.setItem('refresh_token', result.tokens.refresh);
+        localStorage.setItem('user', JSON.stringify(result.user));
+        navigate('/home');
+      } else {
+        setErrors((prev) => ({ ...prev, general: result.message || 'Google sign-up failed' }));
+      }
+    } catch (error: any) {
+      setErrors((prev) => ({ ...prev, general: error?.response?.data?.message || 'Google sign-up failed' }));
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID) return;
+    
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      (window as any).google?.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleResponse,
+      });
+      const btnDiv = document.getElementById('google-signup-btn');
+      if (btnDiv) {
+        (window as any).google?.accounts.id.renderButton(btnDiv, {
+          theme: 'outline',
+          size: 'large',
+          width: '100%',
+          text: 'signup_with',
+        });
+      }
+    };
+    document.body.appendChild(script);
+    return () => { document.body.removeChild(script); };
+  }, [handleGoogleResponse]);
 
   const validateForm = () => {
     const newErrors = {
@@ -418,6 +466,20 @@ const SignUp: React.FC = () => {
                 t('signup_register_button')
               )}
             </button>
+
+            {GOOGLE_CLIENT_ID && (
+              <>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-4 bg-white text-gray-500">or</span>
+                  </div>
+                </div>
+                <div id="google-signup-btn" className="flex justify-center"></div>
+              </>
+            )}
           </form>
 
           {/* Divider */}

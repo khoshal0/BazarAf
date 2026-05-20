@@ -4,8 +4,28 @@ from django.core.mail import send_mail
 from django.conf import settings
 import logging
 import os
+import threading
 
 logger = logging.getLogger(__name__)
+
+
+def _send_email_async(subject, message, from_email, recipient_list):
+    """Send email in a background thread to avoid blocking the request."""
+    def _send():
+        try:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=from_email,
+                recipient_list=recipient_list,
+                fail_silently=False,
+            )
+            logger.info(f"Email sent to {recipient_list}")
+        except Exception as e:
+            logger.error(f"Failed to send email to {recipient_list}: {e}")
+    
+    thread = threading.Thread(target=_send, daemon=True)
+    thread.start()
 
 def send_vendor_approval_email(vendor):
     """
@@ -41,27 +61,12 @@ Best regards,
 The BazaarAF Team
     """
     
-    try:
-        # Check if email is configured
-        if not settings.EMAIL_HOST_USER:
-            logger.warning(f"Email not configured. Would send to: {vendor.user.email}")
-            print(f"📧 EMAIL (not sent - no config): Approval email to {vendor.user.email}")
-            return False
-        
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[vendor.user.email],
-            fail_silently=False,
-        )
-        logger.info(f"Approval email sent to {vendor.user.email}")
-        print(f"✅ EMAIL SENT: Approval email to {vendor.user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Error sending approval email: {e}")
-        print(f"❌ EMAIL ERROR: {e}")
+    if not settings.EMAIL_HOST_USER:
+        logger.warning(f"Email not configured. Would send to: {vendor.user.email}")
         return False
+    
+    _send_email_async(subject, message, settings.DEFAULT_FROM_EMAIL, [vendor.user.email])
+    return True
 
 
 def send_vendor_rejection_email(vendor, reason=""):
@@ -95,26 +100,12 @@ Best regards,
 The BazaarAF Team
     """
     
-    try:
-        if not settings.EMAIL_HOST_USER:
-            logger.warning(f"Email not configured. Would send to: {vendor.user.email}")
-            print(f"📧 EMAIL (not sent - no config): Rejection email to {vendor.user.email}")
-            return False
-        
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[vendor.user.email],
-            fail_silently=False,
-        )
-        logger.info(f"Rejection email sent to {vendor.user.email}")
-        print(f"✅ EMAIL SENT: Rejection email to {vendor.user.email}")
-        return True
-    except Exception as e:
-        logger.error(f"Error sending rejection email: {e}")
-        print(f"❌ EMAIL ERROR: {e}")
+    if not settings.EMAIL_HOST_USER:
+        logger.warning(f"Email not configured. Would send to: {vendor.user.email}")
         return False
+    
+    _send_email_async(subject, message, settings.DEFAULT_FROM_EMAIL, [vendor.user.email])
+    return True
 
 
 def send_email_verification_email(user, verification_token, frontend_url=None):
@@ -145,29 +136,12 @@ Best regards,
 The BazaarAF Team
     """
     
-    try:
-        if not settings.EMAIL_HOST_USER:
-            logger.warning(f"✉️ DEVELOPMENT MODE: Email not configured. Verification link: {verification_url}")
-            print(f"\n📧 VERIFICATION EMAIL (Development Mode - not sent):")
-            print(f"   To: {user.email}")
-            print(f"   Link: {verification_url}")
-            print(f"   Expires: 24 hours\n")
-            return True  # Return True to allow signup even in dev mode
-        
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
-        logger.info(f"Verification email sent to {user.email}")
-        print(f"✅ EMAIL SENT: Verification email to {user.email}")
+    if not settings.EMAIL_HOST_USER:
+        logger.warning(f"Email not configured. Verification link: {verification_url}")
         return True
-    except Exception as e:
-        logger.error(f"Error sending verification email: {e}")
-        print(f"❌ EMAIL ERROR: {e}")
-        return True  # Don't block signup due to email errors
+    
+    _send_email_async(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+    return True
 
 
 def send_password_reset_email(user, reset_token, frontend_url=None):
@@ -198,26 +172,9 @@ Best regards,
 The BazaarAF Team
     """
     
-    try:
-        if not settings.EMAIL_HOST_USER:
-            logger.warning(f"✉️ DEVELOPMENT MODE: Email not configured. Reset link: {reset_url}")
-            print(f"\n📧 PASSWORD RESET EMAIL (Development Mode - not sent):")
-            print(f"   To: {user.email}")
-            print(f"   Link: {reset_url}")
-            print(f"   Expires: 1 hour\n")
-            return True  # Return True even in dev mode
-        
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
-        logger.info(f"Password reset email sent to {user.email}")
-        print(f"✅ EMAIL SENT: Password reset email to {user.email}")
+    if not settings.EMAIL_HOST_USER:
+        logger.warning(f"Email not configured. Reset link: {reset_url}")
         return True
-    except Exception as e:
-        logger.error(f"Error sending password reset email: {e}")
-        print(f"❌ EMAIL ERROR: {e}")
-        return True  # Don't block password reset due to email errors
+    
+    _send_email_async(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email])
+    return True
