@@ -229,8 +229,14 @@ class LoginView(APIView):
                 is_email = True
                 user = User.objects.filter(email__iexact=identifier).first()
             except DjangoValidationError:
-                # It's a phone number
-                user = User.objects.filter(phone=identifier).first()
+                # It's a phone number - normalize before lookup
+                phone = identifier.strip().replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
+                if not phone.startswith('+'):
+                    if phone.startswith('0'):
+                        phone = '+93' + phone[1:]
+                    elif phone.isdigit():
+                        phone = '+93' + phone
+                user = User.objects.filter(phone=phone).first()
             
             # If user not found
             if not user:
@@ -248,14 +254,8 @@ class LoginView(APIView):
                         'message': 'Account is inactive. Please contact support.'
                     }, status=status.HTTP_401_UNAUTHORIZED)
                 
-                # Check if email is verified
-                if user.email and not user.email_verified:
-                    return Response({
-                        'status': 'error',
-                        'message': 'Please verify your email before logging in. Check your email for the verification link.',
-                        'requires_email_verification': True,
-                        'email': user.email
-                    }, status=status.HTTP_401_UNAUTHORIZED)
+                # Note: Email verification is optional - don't block login for unverified emails
+                # Users register with phone (primary identifier) and email is secondary
 
                 vendor = Vendor.objects.filter(user=user).first()
                 if vendor and vendor.two_factor_enabled and vendor.totp_secret:
