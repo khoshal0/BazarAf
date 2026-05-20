@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 import {
   User,
   Phone,
@@ -163,7 +164,7 @@ const SellerRegistration: React.FC = () => {
         formDataToSend.append('business_document', formData.business_document);
       }
 
-      const response = await axios.post(
+      const response = await api.post(
         '/seller-applications/',
         formDataToSend,
         {
