@@ -165,9 +165,9 @@ const SignUp: React.FC = () => {
 
       // Auto-redirect after 3 seconds
       setTimeout(() => {
-        if (response.requires_email_verification && response.verification_token) {
-          // Email verification flow - go to verify-email page with token
-          navigate(`/verify-email?token=${response.verification_token}`);
+        if (response.requires_email_verification) {
+          // Email verification required - go to pending page
+          navigate('/verify-email-pending', { state: { email: formData.email.trim() } });
         } else {
           // No email - go to login
           navigate('/login');

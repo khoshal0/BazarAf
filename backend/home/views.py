@@ -404,15 +404,12 @@ class RegisterView(APIView):
             
             # If user has email, they need to verify it
             if user.email and not user.email_verified:
-                # Get the verification token that was generated during save
-                verification_token = user.email_verification_token
                 return Response({
                     'status': 'success',
-                    'message': 'Registration successful! Please verify your email to complete signup.',
+                    'message': 'Registration successful! Please check your email to verify your account.',
                     'user': user_data,
                     'requires_email_verification': True,
                     'email': user.email,
-                    'verification_token': verification_token,
                 }, status=status.HTTP_201_CREATED)
             
             # Generate tokens for user without email requirement
