@@ -9,6 +9,7 @@ export default function VerifyEmailPending() {
   const navigate = useNavigate();
   const location = useLocation();
   const email = (location.state as any)?.email || '';
+  const emailSent = (location.state as any)?.emailSent ?? true;
   const [resending, setResending] = useState(false);
   const [resendMessage, setResendMessage] = useState('');
   const [resendStatus, setResendStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -41,9 +42,19 @@ export default function VerifyEmailPending() {
 
           <h1 className="text-2xl font-bold mb-2">Verify Your Email</h1>
           <p className="text-gray-600 mb-6">
-            We sent a verification link to{' '}
-            <span className="font-semibold text-gray-900">{email || 'your email'}</span>.
-            Please check your inbox and click the link to verify your account.
+            {emailSent ? (
+              <>
+                We sent a verification link to{' '}
+                <span className="font-semibold text-gray-900">{email || 'your email'}</span>.
+                Please check your inbox and click the link to verify your account.
+              </>
+            ) : (
+              <>
+                We could not send a verification email to{' '}
+                <span className="font-semibold text-gray-900">{email || 'your email'}</span>.
+                Please use the resend button below.
+              </>
+            )}
           </p>
 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-sm text-amber-800">
