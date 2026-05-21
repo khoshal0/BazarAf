@@ -1,4 +1,4 @@
-ÿþaltgraph==0.17.4
+altgraph==0.17.4
 annotated-types==0.7.0
 asgiref==3.7.2
 bert-extractive-summarizer==0.4.2
