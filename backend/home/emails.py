@@ -15,8 +15,8 @@ def _send_email(subject, message, from_email, recipient_list) -> bool:
         logger.warning("Email not configured. Missing EMAIL_HOST_USER.")
         return False
 
-    # Always use the authenticated SMTP user as sender to avoid rejection
-    from_email = settings.EMAIL_HOST_USER or from_email or settings.DEFAULT_FROM_EMAIL
+    if not from_email:
+        from_email = settings.DEFAULT_FROM_EMAIL
 
     # Ensure we pass a plain address to the SMTP server
     from_email = parseaddr(from_email)[1] or from_email
