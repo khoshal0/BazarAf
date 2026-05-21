@@ -167,12 +167,7 @@ const SignUp: React.FC = () => {
       setTimeout(() => {
         if (response.requires_email_verification) {
           // Email verification required - go to pending page
-          navigate('/verify-email-pending', {
-            state: {
-              email: formData.email.trim(),
-              emailSent: response.email_sent !== false,
-            },
-          });
+          navigate('/verify-email-pending', { state: { email: formData.email.trim() } });
         } else {
           // No email - go to login
           navigate('/login');

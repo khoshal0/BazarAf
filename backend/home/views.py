@@ -398,28 +398,18 @@ class RegisterView(APIView):
         
         if serializer.is_valid():
             user = serializer.save()
-            email_sent = None
             
             # Get user data
             user_data = UserSerializer(user).data
             
             # If user has email, they need to verify it
             if user.email and not user.email_verified:
-                verification_token = user.generate_email_verification_token()
-                from .emails import send_email_verification_email
-                frontend_url = request.data.get('frontend_url') or os.getenv('FRONTEND_URL', 'http://localhost:5173')
-                email_sent = send_email_verification_email(user, verification_token, frontend_url)
                 return Response({
                     'status': 'success',
-                    'message': (
-                        'Registration successful! Please check your email to verify your account.'
-                        if email_sent
-                        else 'Registration successful, but we could not send the verification email. Please try resend.'
-                    ),
+                    'message': 'Registration successful! Please check your email to verify your account.',
                     'user': user_data,
                     'requires_email_verification': True,
                     'email': user.email,
-                    'email_sent': email_sent,
                 }, status=status.HTTP_201_CREATED)
             
             # Generate tokens for user without email requirement
@@ -613,18 +603,11 @@ class ResendVerificationEmailView(APIView):
             verification_token = user.generate_email_verification_token()
             frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
             from .emails import send_email_verification_email
-            email_sent = send_email_verification_email(user, verification_token, frontend_url)
-
-            if not email_sent:
-                return Response({
-                    'status': 'error',
-                    'message': 'Email service is not configured or failed to send. Please try again later.'
-                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-
+            send_email_verification_email(user, verification_token, frontend_url)
+            
             return Response({
                 'status': 'success',
-                'message': 'Verification email sent. Please check your inbox.',
-                'email_sent': True,
+                'message': 'Verification email sent. Please check your inbox.'
             })
         except User.DoesNotExist:
             # Don't reveal if email exists

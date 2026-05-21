@@ -123,7 +123,7 @@ const Login: React.FC = () => {
       }
 
       if (response.requires_email_verification) {
-        navigate('/verify-email-pending', { state: { email: response.email } });
+        navigate('/verify-email', { state: { email: response.email } });
         return;
       }
 
