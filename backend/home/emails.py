@@ -106,7 +106,7 @@ The BazaarAF Team
     return _send_email(subject, message, settings.DEFAULT_FROM_EMAIL, [vendor.user.email])
 
 
-def send_email_verification_email(user, verification_token, frontend_url=None, verification_code=None):
+def send_email_verification_email(user, verification_token, frontend_url=None):
     """
     Send email verification link to user after signup
     """
@@ -125,9 +125,6 @@ To complete your registration, please verify your email address by clicking the 
 
 Verification Link:
 {verification_url}
-
-Verification Code:
-{verification_code or 'Use the link above'}
 
 This link will expire in 24 hours.
 

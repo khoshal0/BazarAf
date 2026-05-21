@@ -406,10 +406,9 @@ class RegisterView(APIView):
             # If user has email, they need to verify it
             if user.email and not user.email_verified:
                 verification_token = user.generate_email_verification_token()
-                verification_code = user.generate_email_verification_code()
                 from .emails import send_email_verification_email
                 frontend_url = request.data.get('frontend_url') or os.getenv('FRONTEND_URL', 'http://localhost:5173')
-                email_sent = send_email_verification_email(user, verification_token, frontend_url, verification_code)
+                email_sent = send_email_verification_email(user, verification_token, frontend_url)
                 return Response({
                     'status': 'success',
                     'message': (
@@ -420,7 +419,6 @@ class RegisterView(APIView):
                     'user': user_data,
                     'requires_email_verification': True,
                     'email': user.email,
-                    'otp_required': True,
                     'email_sent': email_sent,
                 }, status=status.HTTP_201_CREATED)
             
@@ -563,43 +561,16 @@ class VerifyEmailView(APIView):
     
     def post(self, request):
         token = request.data.get('token')
-        code = str(request.data.get('code', '')).strip()
-        email = str(request.data.get('email', '')).strip()
-
-        if not token and not code:
+        
+        if not token:
             return Response({
                 'status': 'error',
-                'message': 'Token or code is required'
+                'message': 'Token is required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            if code:
-                if not email:
-                    return Response({
-                        'status': 'error',
-                        'message': 'Email is required for code verification'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                user = User.objects.filter(email__iexact=email).first()
-                if not user:
-                    return Response({
-                        'status': 'error',
-                        'message': 'Invalid email or code'
-                    }, status=status.HTTP_400_BAD_REQUEST)
-
-                if user.verify_email_code(code):
-                    return Response({
-                        'status': 'success',
-                        'message': 'Email verified successfully'
-                    }, status=status.HTTP_200_OK)
-
-                return Response({
-                    'status': 'error',
-                    'message': 'Code expired or invalid'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
             user = User.objects.get(email_verification_token=token)
-
+            
             if user.verify_email_token(token):
                 return Response({
                     'status': 'success',
@@ -640,10 +611,9 @@ class ResendVerificationEmailView(APIView):
                 })
             
             verification_token = user.generate_email_verification_token()
-            verification_code = user.generate_email_verification_code()
             frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
             from .emails import send_email_verification_email
-            email_sent = send_email_verification_email(user, verification_token, frontend_url, verification_code)
+            email_sent = send_email_verification_email(user, verification_token, frontend_url)
 
             if not email_sent:
                 return Response({
@@ -654,7 +624,6 @@ class ResendVerificationEmailView(APIView):
             return Response({
                 'status': 'success',
                 'message': 'Verification email sent. Please check your inbox.',
-                'otp_required': True,
                 'email_sent': True,
             })
         except User.DoesNotExist:
