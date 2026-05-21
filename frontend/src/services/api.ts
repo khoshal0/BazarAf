@@ -116,6 +116,11 @@ export const authAPI = {
     const response = await api.post('/auth/resend-verification/', { email });
     return response.data;
   },
+
+  verifyEmailCode: async (email: string, code: string) => {
+    const response = await api.post('/auth/verify-email/', { email, code });
+    return response.data;
+  },
 };
 // frontend/src/services/api.ts
 export const createOrder = async (orderData: any) => {

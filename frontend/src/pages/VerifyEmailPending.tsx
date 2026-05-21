@@ -11,8 +11,12 @@ export default function VerifyEmailPending() {
   const email = (location.state as any)?.email || '';
   const emailSent = (location.state as any)?.emailSent ?? true;
   const [resending, setResending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [code, setCode] = useState('');
   const [resendMessage, setResendMessage] = useState('');
   const [resendStatus, setResendStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [verifyMessage, setVerifyMessage] = useState('');
+  const [verifyStatus, setVerifyStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
   const handleResend = async () => {
     if (!email) return;
@@ -27,6 +31,23 @@ export default function VerifyEmailPending() {
       setResendMessage(error?.response?.data?.message || 'Failed to resend. Please try again.');
     } finally {
       setResending(false);
+    }
+  };
+
+  const handleVerify = async () => {
+    if (!email || !code.trim()) return;
+    setVerifying(true);
+    setVerifyMessage('');
+    try {
+      const result = await authAPI.verifyEmailCode(email, code.trim());
+      setVerifyStatus('success');
+      setVerifyMessage(result.message || 'Email verified successfully!');
+      setTimeout(() => navigate('/login'), 1200);
+    } catch (error: any) {
+      setVerifyStatus('error');
+      setVerifyMessage(error?.response?.data?.message || 'Invalid or expired code.');
+    } finally {
+      setVerifying(false);
     }
   };
 
@@ -72,7 +93,38 @@ export default function VerifyEmailPending() {
             </div>
           )}
 
+          {verifyMessage && (
+            <div className={`mb-4 p-3 rounded-lg text-sm flex items-center gap-2 ${
+              verifyStatus === 'success'
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {verifyStatus === 'success' ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+              {verifyMessage}
+            </div>
+          )}
+
           <div className="space-y-3">
+            <div className="text-left">
+              <label className="block text-sm font-medium text-gray-700 mb-1">Verification code</label>
+              <input
+                value={code}
+                onChange={(event) => setCode(event.target.value)}
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="Enter 6-digit code"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+            </div>
+
+            <Button
+              onClick={handleVerify}
+              disabled={verifying || !email || code.trim().length !== 6}
+              className="w-full bg-teal-600 hover:bg-teal-700"
+            >
+              {verifying ? 'Verifying...' : 'Verify Email'}
+            </Button>
+
             <Button
               onClick={handleResend}
               disabled={resending || !email}

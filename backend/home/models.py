@@ -59,6 +59,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     email_verified = models.BooleanField(default=False)
     email_verification_token = models.CharField(max_length=255, blank=True, null=True)
     email_verification_token_created = models.DateTimeField(blank=True, null=True)
+    email_verification_code = models.CharField(max_length=6, blank=True, null=True)
+    email_verification_code_created = models.DateTimeField(blank=True, null=True)
     
     # Password reset fields
     password_reset_token = models.CharField(max_length=255, blank=True, null=True)
@@ -149,6 +151,42 @@ class User(AbstractBaseUser, PermissionsMixin):
                 self.email_verification_token = None
                 self.email_verification_token_created = None
                 self.save()
+                return True
+        return False
+
+    def generate_email_verification_code(self):
+        """Generate a 6-digit email verification code"""
+        from django.utils import timezone
+        import secrets
+
+        code = f"{secrets.randbelow(1000000):06d}"
+        self.email_verification_code = code
+        self.email_verification_code_created = timezone.now()
+        self.save(update_fields=["email_verification_code", "email_verification_code_created"])
+        return code
+
+    def verify_email_code(self, code: str) -> bool:
+        """Verify email code and mark email as verified"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        if not code:
+            return False
+
+        if self.email_verification_code == code:
+            if self.email_verification_code_created and timezone.now() - self.email_verification_code_created < timedelta(minutes=15):
+                self.email_verified = True
+                self.email_verification_code = None
+                self.email_verification_code_created = None
+                self.email_verification_token = None
+                self.email_verification_token_created = None
+                self.save(update_fields=[
+                    "email_verified",
+                    "email_verification_code",
+                    "email_verification_code_created",
+                    "email_verification_token",
+                    "email_verification_token_created",
+                ])
                 return True
         return False
     
