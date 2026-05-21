@@ -72,12 +72,24 @@ MIDDLEWARE = [
     'Bazar.cors_middleware.MediaCorsMiddleware',  # Add custom CORS for media files
 ]
 # Allow frontend to make requests
+_extra_cors_origins = [
+    origin.strip()
+    for origin in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Vite default
     "http://localhost:5174",  # Vite when 5173 is taken
     "http://localhost:3000",  # React default
     "https://bazar-af-seven.vercel.app",  # Production frontend (removed trailing slash)
     os.getenv('FRONTEND_URL', ''),  # Allow frontend URL from environment
+    *_extra_cors_origins,
+]
+
+# Allow Vercel preview/prod domains without needing to hardcode each URL
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",
 ]
 
 # Remove empty strings from CORS_ALLOWED_ORIGINS
@@ -291,6 +303,13 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'BazaarAF <noreply@bazaaraf
 
 # Google OAuth
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
+GOOGLE_CLIENT_IDS = [
+    value.strip()
+    for value in os.getenv('GOOGLE_CLIENT_IDS', '').split(',')
+    if value.strip()
+]
+if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_ID not in GOOGLE_CLIENT_IDS:
+    GOOGLE_CLIENT_IDS.append(GOOGLE_CLIENT_ID)
 
 # Logging Configuration
 LOGGING = {
