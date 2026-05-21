@@ -3,7 +3,6 @@ views.py - Professional E-commerce API Views
 """
 from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.auth import authenticate
 from django.core import signing
@@ -451,8 +450,8 @@ class GoogleAuthView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            google_client_ids = getattr(settings, 'GOOGLE_CLIENT_IDS', [])
-            if not google_client_ids:
+            google_client_id = os.getenv('GOOGLE_CLIENT_ID', '')
+            if not google_client_id:
                 return Response({
                     'status': 'error',
                     'message': 'Google authentication is not configured'
@@ -460,7 +459,7 @@ class GoogleAuthView(APIView):
             
             # Verify the Google ID token
             idinfo = id_token.verify_oauth2_token(
-                token, google_requests.Request(), google_client_ids
+                token, google_requests.Request(), google_client_id
             )
             
             email = idinfo.get('email')
