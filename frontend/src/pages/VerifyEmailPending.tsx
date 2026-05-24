@@ -10,8 +10,27 @@ export default function VerifyEmailPending() {
   const location = useLocation();
   const email = (location.state as any)?.email || '';
   const [resending, setResending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [otp, setOtp] = useState('');
   const [resendMessage, setResendMessage] = useState('');
   const [resendStatus, setResendStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  const handleVerify = async () => {
+    if (!email || otp.trim().length !== 6) return;
+    setVerifying(true);
+    setResendMessage('');
+    try {
+      const result = await authAPI.verifyEmail(email, otp.trim());
+      setResendStatus('success');
+      setResendMessage(result.message || 'Email verified successfully!');
+      setTimeout(() => navigate('/login'), 1200);
+    } catch (error: any) {
+      setResendStatus('error');
+      setResendMessage(error?.response?.data?.message || 'Invalid or expired verification code.');
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const handleResend = async () => {
     if (!email) return;
@@ -41,9 +60,9 @@ export default function VerifyEmailPending() {
 
           <h1 className="text-2xl font-bold mb-2">Verify Your Email</h1>
           <p className="text-gray-600 mb-6">
-            We sent a verification link to{' '}
+            We sent a verification code to{' '}
             <span className="font-semibold text-gray-900">{email || 'your email'}</span>.
-            Please check your inbox and click the link to verify your account.
+            Please enter the 6-digit code or click the email link to verify your account.
           </p>
 
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 text-sm text-amber-800">
@@ -62,13 +81,29 @@ export default function VerifyEmailPending() {
           )}
 
           <div className="space-y-3">
+            <input
+              value={otp}
+              onChange={(event) => setOtp(event.target.value.replace(/\D/g, '').slice(0, 6))}
+              placeholder="Enter 6-digit code"
+              className="w-full border border-gray-300 rounded-lg px-4 py-3 text-center text-lg tracking-widest focus:outline-none focus:ring-2 focus:ring-teal-500"
+              disabled={verifying || !email}
+            />
+
+            <Button
+              onClick={handleVerify}
+              disabled={verifying || !email || otp.length !== 6}
+              className="w-full bg-teal-600 hover:bg-teal-700"
+            >
+              {verifying ? 'Verifying...' : 'Verify Email'}
+            </Button>
+
             <Button
               onClick={handleResend}
               disabled={resending || !email}
               variant="outline"
               className="w-full"
             >
-              {resending ? 'Sending...' : 'Resend Verification Email'}
+              {resending ? 'Sending...' : 'Resend Verification Code'}
             </Button>
 
             <Button

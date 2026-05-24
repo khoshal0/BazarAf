@@ -240,7 +240,7 @@ const SignUp: React.FC = () => {
             </p>
 
             <button
-              onClick={() => window.location.href = '/verify-email'}
+              onClick={() => navigate('/verify-email-pending', { state: { email: formData.email.trim() } })}
               className="text-teal-600 hover:text-teal-700 font-semibold text-sm"
             >
               {t('signup_go_to_verification')}

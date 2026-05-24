@@ -116,14 +116,18 @@ def send_email_verification_email(user, verification_token, frontend_url=None):
         frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
     
     subject = 'Verify your BazaarAF Email Address ✉️'
-    verification_url = f"{frontend_url}/verify-email?token={verification_token}"
+    verification_url = f"{frontend_url}/verify-email?email={user.email}&otp={verification_token}"
     
     message = f"""
 Dear {user.full_name},
 
 Thank you for signing up on BazaarAF! 🎉
 
-To complete your registration, please verify your email address by clicking the link below:
+To complete your registration, use this verification code:
+
+{verification_token}
+
+Or click the link below:
 
 Verification Link:
 {verification_url}

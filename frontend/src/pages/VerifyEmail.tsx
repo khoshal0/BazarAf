@@ -13,16 +13,17 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     const verifyEmail = async () => {
-      const token = searchParams.get('token');
+      const token = searchParams.get('token') || searchParams.get('otp');
+      const email = searchParams.get('email') || '';
 
       if (!token) {
         setStatus('invalid');
-        setMessage('No verification token provided.');
+        setMessage('No verification code provided.');
         return;
       }
 
       try {
-        const response = await api.post('/auth/verify-email/', { token });
+        const response = await api.post('/auth/verify-email/', { token, email });
         
         if (response.status === 200) {
           setStatus('success');
@@ -36,7 +37,7 @@ export default function VerifyEmail() {
         setStatus('error');
         setMessage(
           error.response?.data?.message ||
-          'Email verification failed. Token may have expired.'
+          'Email verification failed. Code may have expired.'
         );
       }
     };
@@ -97,8 +98,8 @@ export default function VerifyEmail() {
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
                 {status === 'error' 
-                  ? 'Your verification link may have expired. Please sign up again with your email.'
-                  : 'Please use the verification link sent to your email.'}
+                  ? 'Your verification code may have expired. Please request a new code.'
+                  : 'Please use the verification code sent to your email.'}
               </p>
               <Button
                 onClick={() => navigate('/signup')}

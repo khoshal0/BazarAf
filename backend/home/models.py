@@ -128,22 +128,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
     
     def generate_email_verification_token(self):
-        """Generate a secure email verification token"""
         import secrets
         from django.utils import timezone
         
-        self.email_verification_token = secrets.token_urlsafe(32)
+        self.email_verification_token = f"{secrets.randbelow(1000000):06d}"
         self.email_verification_token_created = timezone.now()
         self.save()
         return self.email_verification_token
     
     def verify_email_token(self, token):
-        """Verify email token and mark email as verified"""
         from django.utils import timezone
         from datetime import timedelta
         
-        if self.email_verification_token == token:
-            # Token expires after 24 hours
+        if self.email_verification_token == str(token).strip():
             if self.email_verification_token_created and timezone.now() - self.email_verification_token_created < timedelta(hours=24):
                 self.email_verified = True
                 self.email_verification_token = None

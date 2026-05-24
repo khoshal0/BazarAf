@@ -246,6 +246,14 @@ class LoginView(APIView):
                     'message': 'Invalid email/phone or password'
                 }, status=status.HTTP_401_UNAUTHORIZED)
             
+            if not user.has_usable_password():
+                return Response({
+                    'status': 'error',
+                    'message': 'This account was created with Google. Please use Continue with Google to sign in.',
+                    'requires_google_auth': True,
+                    'email': user.email
+                }, status=status.HTTP_401_UNAUTHORIZED)
+
             # Check if password is correct
             if user.check_password(password):
                 # Check if user is active
@@ -259,7 +267,7 @@ class LoginView(APIView):
                 if user.email and not user.email_verified:
                     return Response({
                         'status': 'error',
-                        'message': 'Please verify your email before logging in. Check your inbox for the verification link.',
+                        'message': 'Please verify your email before logging in. Check your inbox for the verification code.',
                         'requires_email_verification': True,
                         'email': user.email
                     }, status=status.HTTP_401_UNAUTHORIZED)
@@ -481,10 +489,13 @@ class GoogleAuthView(APIView):
                     user.save(update_fields=['email_verified'])
             else:
                 # New user - create account
+                phone = None
+                while not phone or User.objects.filter(phone=phone).exists():
+                    phone = f"+93{secrets.randbelow(1000000000):09d}"
                 user = User(
                     email=email,
                     full_name=full_name,
-                    phone=f"+93{uuid.uuid4().hex[:9]}",  # Temp phone, user can update later
+                    phone=phone,
                     email_verified=True,
                     role='customer',
                 )
@@ -550,16 +561,20 @@ class VerifyEmailView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        token = request.data.get('token')
+        token = str(request.data.get('token') or request.data.get('otp') or '').strip()
+        email = str(request.data.get('email') or '').strip()
         
         if not token:
             return Response({
                 'status': 'error',
-                'message': 'Token is required'
+                'message': 'Verification code is required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            user = User.objects.get(email_verification_token=token)
+            if email:
+                user = User.objects.get(email__iexact=email)
+            else:
+                user = User.objects.get(email_verification_token=token)
             
             if user.verify_email_token(token):
                 return Response({
@@ -569,7 +584,7 @@ class VerifyEmailView(APIView):
             else:
                 return Response({
                     'status': 'error',
-                    'message': 'Token expired or invalid'
+                    'message': 'Verification code expired or invalid'
                 }, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             return Response({
@@ -607,13 +622,13 @@ class ResendVerificationEmailView(APIView):
             
             return Response({
                 'status': 'success',
-                'message': 'Verification email sent. Please check your inbox.'
+                'message': 'Verification code sent. Please check your inbox.'
             })
         except User.DoesNotExist:
             # Don't reveal if email exists
             return Response({
                 'status': 'success',
-                'message': 'If this email is registered, a verification link has been sent.'
+                'message': 'If this email is registered, a verification code has been sent.'
             })
 
 

@@ -102,7 +102,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"phone": "Phone number already registered."})
         
         # Check email uniqueness if provided
-        if data.get('email') and User.objects.filter(email=data['email']).exists():
+        if data.get('email') and User.objects.filter(email__iexact=data['email']).exists():
             raise serializers.ValidationError({"email": "Email already registered."})
         
         # Validate password strength
@@ -1038,7 +1038,7 @@ class RegisterSerializer(serializers.Serializer):
             raise serializers.ValidationError({"phone": "Phone number already registered."})
         
         # Check email uniqueness if provided
-        if data.get('email') and User.objects.filter(email=data['email']).exists():
+        if data.get('email') and User.objects.filter(email__iexact=data['email']).exists():
             raise serializers.ValidationError({"email": "Email already registered."})
         
         # Validate password strength
