@@ -24,7 +24,7 @@ def _send_email_async(subject, message, from_email, recipient_list):
         except Exception as e:
             logger.error(f"Failed to send email to {recipient_list}: {e}")
     
-    thread = threading.Thread(target=_send, daemon=True)
+    thread = threading.Thread(target=_send)
     thread.start()
 
 def send_vendor_approval_email(vendor):

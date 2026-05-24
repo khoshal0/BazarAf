@@ -287,7 +287,7 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
 EMAIL_TIMEOUT = 10  # 10 second timeout for SMTP connections
-DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'BazaarAF <noreply@bazaaraf.com>')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL') or (f'BazaarAF <{EMAIL_HOST_USER}>' if EMAIL_HOST_USER else 'BazaarAF <noreply@bazaaraf.com>')
 
 # Google OAuth
 GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '')
