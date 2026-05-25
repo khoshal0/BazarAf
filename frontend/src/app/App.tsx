@@ -189,12 +189,19 @@ export default function App() {
     </div>
   );
 
+  const ExternalLandingRedirect = () => {
+    useEffect(() => {
+      window.location.href = 'https://bazar-af-seven.vercel.app/home';
+    }, []);
+    return null;
+  };
+
   return (
     <Router>
       <div className="min-h-screen bg-background">
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<ExternalLandingRedirect />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
