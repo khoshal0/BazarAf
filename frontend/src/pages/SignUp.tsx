@@ -156,8 +156,13 @@ const SignUp: React.FC = () => {
         role: 'customer',
         frontend_url: window.location.origin, // Pass actual frontend URL (port 5174)
       });
-
-
+      if (response?.tokens?.access) {
+        localStorage.setItem('access_token', response.tokens.access);
+        localStorage.setItem('refresh_token', response.tokens.refresh);
+      }
+      if (response?.user) {
+        localStorage.setItem('user', JSON.stringify(response.user));
+      }
 
       // For e-commerce flow, both cases show success
       // (with or without email verification requirement)
@@ -165,13 +170,7 @@ const SignUp: React.FC = () => {
 
       // Auto-redirect after 3 seconds
       setTimeout(() => {
-        if (response.requires_email_verification) {
-          // Email verification required - go to pending page
-          navigate('/verify-email-pending', { state: { email: formData.email.trim() } });
-        } else {
-          // No email - go to login
-          navigate('/login');
-        }
+        navigate('/home');
       }, 3000);
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -217,6 +216,7 @@ const SignUp: React.FC = () => {
             
             <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('signup_success_title')}</h2>
             
+            {/* Email verification messaging disabled for demo.
             <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 my-6">
               <p className="text-sm text-gray-700 mb-2">
                 <span className="font-semibold">{t('signup_verify_email_title')}</span>
@@ -234,17 +234,20 @@ const SignUp: React.FC = () => {
                 <span className="font-semibold">{t('signup_tip_title')}</span> {t('signup_tip_description')}
               </p>
             </div>
+            */}
 
             <p className="text-sm text-gray-500 my-6">
               <span className="inline-block animate-pulse">{t('signup_redirecting')}</span>
             </p>
 
+            {/*
             <button
               onClick={() => navigate('/verify-email-pending', { state: { email: formData.email.trim() } })}
               className="text-teal-600 hover:text-teal-700 font-semibold text-sm"
             >
               {t('signup_go_to_verification')}
             </button>
+            */}
           </div>
 
           <div className="mt-6 text-center">

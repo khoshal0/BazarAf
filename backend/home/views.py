@@ -407,18 +407,24 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             
+            # Demo mode: skip email verification to allow immediate access.
+            if user.email and not user.email_verified:
+                user.email_verified = True
+                user.save(update_fields=['email_verified'])
+
             # Get user data
             user_data = UserSerializer(user).data
-            
+
             # If user has email, they need to verify it
-            if user.email and not user.email_verified:
-                return Response({
-                    'status': 'success',
-                    'message': 'Registration successful! Please check your email to verify your account.',
-                    'user': user_data,
-                    'requires_email_verification': True,
-                    'email': user.email,
-                }, status=status.HTTP_201_CREATED)
+            # (disabled for demo)
+            # if user.email and not user.email_verified:
+            #     return Response({
+            #         'status': 'success',
+            #         'message': 'Registration successful! Please check your email to verify your account.',
+            #         'user': user_data,
+            #         'requires_email_verification': True,
+            #         'email': user.email,
+            #     }, status=status.HTTP_201_CREATED)
             
             # Generate tokens for user without email requirement
             refresh = RefreshToken.for_user(user)
